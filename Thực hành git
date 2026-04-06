@@ -1,0 +1,12 @@
+# 1. Học git workflow : 
+- Tự research để tìm hiểu kiến thức căn bản, câu lệnh, cách sử dụng
+- Tham khảo video của TienNT: https://drive.google.com/file/d/1m_bBpaHNXBiXcGkcOLSlU4eNeuNVwzIF/view?ts=69ce4c3b
+
+# 2. Thực hành 
+## Mục tiêu: Sử dụng git thành thạo để pull/push tài liệu lên gitlab
+
+TODO:
+- Có thể thực hành trên các trang web hướng dẫn git: ví dụ:  https://learngitbranching.js.org/ 
+- Thực hành trực tiếp trên Project Testing này
++ Lấy file này làm gốc : tạo branch mới -> sửa nội dung trên file này -> push lên =>Mục tiêu biết flow xử lý conflict merge request
++ Tạo các file khác
