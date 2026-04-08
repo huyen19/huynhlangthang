@@ -1,5 +1,5 @@
-Thực hành git
-Tạo file mới
+- Thực hành git
+- [x] Tạo file mới
 
 | TC     | Pre-condition | Step | Expect | Result |
 | ------ | ------------- | ---- | ------ | ------ |
