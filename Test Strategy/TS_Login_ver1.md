@@ -1,6 +1,6 @@
 ---
-file: TS_Login_ver1.md
-screen: L-01 / L-02 / L-03 / L-04 / L-05 / L-06 — Login & Password Reset
+title: Test Strategy — Login / OTP / Reset Password
+screens: L-01, L-02, L-03, L-04, L-05, L-06
 created: 2026-04-21
 version: 1.0
 references:
@@ -11,55 +11,43 @@ references:
   - Requirements/Login/L-05_パスワード再設定_パスワード再設定_VN.md
   - Requirements/Login/L-06_パスワード再設定_パスワード変更完了_VN.md
   - Requirements/D-00_Message definition.md
+  - Requirements/D-01_Screens List.md
   - Test Q&A/Q&A_Login_OTP_ResetPassword_VN.md
----
-
-# Test Strategy — Login & Password Reset (L-01 → L-06)
-
 ---
 
 ## 1. System Overview
 
 **Hệ thống**: 販促資材出荷管理システム (KREO) — hệ thống quản lý xuất kho vật liệu xúc tiến bán hàng.
 
-**Phạm vi module này**: Toàn bộ luồng xác thực người dùng gồm 6 màn hình:
+**Phạm vi tài liệu này**: Nhóm màn hình xác thực (ログイン・認証) gồm 6 màn hình: L-01 → L-06.
 
-| Screen | Tên | Mục đích |
-|--------|-----|---------|
-| L-01 | ログイン | Đăng nhập bằng ID + password |
-| L-02 | OTP入力 | Nhập OTP 2FA (chỉ user bật 2FA) |
-| L-03 | パスワードの再設定 | Gửi yêu cầu reset password qua email |
-| L-04 | メール送信完了 | Xác nhận đã gửi email + resend |
-| L-05 | パスワード再設定 | Nhập mật khẩu mới từ link email |
-| L-06 | パスワード変更完了 | Xác nhận đổi mật khẩu thành công |
+**Luồng nghiệp vụ chính**:
 
-**Luồng nghiệp vụ chính:**
+| Luồng | Màn hình | Mô tả |
+|-------|----------|-------|
+| Login 2FA OFF | L-01 → T-01 | Đăng nhập thẳng không qua OTP |
+| Login 2FA ON | L-01 → L-02 → T-01 | Đăng nhập qua xác thực OTP email |
+| Quên mật khẩu | L-01 → L-03 → L-04 → L-05 → L-06 | Reset mật khẩu qua email |
+| Thiết lập mật khẩu lần đầu | L-03 → L-04 → L-05 → L-06 | Admin tạo user mới, user set password |
 
-```
-[L-01] → (2FA ON) → [L-02] → [T-01 TOP]
-[L-01] → (2FA OFF) → [T-01 TOP]
-[L-01] → パスワードを忘れた → [L-03] → [L-04] → (email link) → [L-05] → [L-06] → [L-01]
-```
-
-**Đối tượng người dùng**: Quản lý（管理）và Hậu cần（物流）.
+**Đối tượng người dùng**: Quyền 管理 (quản lý) và 物流 (logistics).
 
 ---
 
 ## 2. Key Test Targets
 
-| ID | Priority | Module / Feature | Lý do |
-|----|----------|-----------------|-------|
-| KT-01 | High | L-01: Xác thực ID + password | Core entry point, mọi user đều đi qua |
-| KT-02 | High | L-01: Lockout sau 5 lần sai | Security critical, ảnh hưởng trực tiếp tài khoản |
-| KT-03 | High | L-01 → L-02: Luồng 2FA | Bảo mật 2 lớp, nhiều edge case |
-| KT-04 | High | L-02: OTP verify (case-sensitive, 6 ký tự) | Dễ sai nếu không test kỹ hoa/thường |
-| KT-05 | High | L-03 → L-04: Gửi reset email (anonymization) | Security: không lộ email đã đăng ký |
-| KT-06 | High | L-05: Đặt mật khẩu mới (rule 12 ký tự, 4 loại) | Complex validation, dễ implement sai |
-| KT-07 | High | L-05: Token one-time-use + expiry 24h | Security critical |
-| KT-08 | Medium | L-02/L-03/L-04: Cooldown 60s resend | Rate limiting, chống spam |
-| KT-09 | Medium | L-01: 2FA OFF → direct to T-01 | Happy path quan trọng |
-| KT-10 | Medium | L-04: Resend email từ màn hoàn tất | Fallback flow cho user không nhận được mail |
-| KT-11 | Low | L-06: Màn xác nhận đổi mật khẩu | Đơn giản nhưng cần verify navigation |
+| ID | Priority | Module / Tính năng | Lý do |
+|----|----------|--------------------|-------|
+| KT-01 | High | L-01: Xác thực ID + Password | Entry point duy nhất vào hệ thống; lỗi ở đây block toàn bộ user |
+| KT-02 | High | L-01: Lockout sau 5 lần sai | Security critical; sai logic có thể lock user hợp lệ hoặc không block attacker |
+| KT-03 | High | L-02: OTP verify (case-sensitive, 6 ký tự) | 2FA là lớp bảo mật thứ 2; OTP fail = không vào được hệ thống |
+| KT-04 | High | L-05: Password format validation (12 ký tự, 4 loại) | Rule phức tạp, dễ implement sai; ảnh hưởng toàn bộ user reset password |
+| KT-05 | High | L-05: Token one-time-use + 24h expiry | Security critical; token reuse = lỗ hổng bảo mật |
+| KT-06 | High | L-03/L-04: Email anonymization (không lộ email đã đăng ký) | Privacy/security requirement rõ ràng |
+| KT-07 | Medium | L-02: OTP resend cooldown 60s | Chống spam; sai logic gây UX xấu hoặc abuse |
+| KT-08 | Medium | L-03: Reset mail cooldown 60s + limit 5 lần/giờ | Rate limiting; sai logic gây spam hoặc block user hợp lệ |
+| KT-09 | Medium | MSG codes hiển thị đúng màn hình, đúng trigger | Consistency; sai MSG gây confuse user |
+| KT-10 | Medium | L-06: Redirect sau reset thành công | Flow completion; sai redirect = user không biết phải làm gì tiếp |
 
 ---
 
@@ -67,39 +55,36 @@ references:
 
 ### Business Risk
 
-| Risk | Impact | Why it matters |
-|------|--------|---------------|
-| Lockout sai logic (đếm sai, reset sai) | High | User bị khóa oan hoặc brute-force không bị chặn |
-| 2FA bypass (session không đúng) | High | Attacker có thể skip OTP screen |
-| Reset password link không invalidate sau dùng | High | Link cũ có thể bị tái sử dụng để chiếm tài khoản |
-| Email enumeration qua L-03/L-04 response | High | Lộ thông tin email đã đăng ký |
-| Password rule không nhất quán L-01 vs L-05 | High | MSG-015 (min 8) vs MSG-019 (min 12) — **[G-043, G-048 PENDING]** |
+| Risk | Impact | Lý do |
+|------|--------|-------|
+| Lockout logic sai (G-001) | High | Lock user hợp lệ 30 phút → không làm việc được; hoặc không lock attacker → brute force |
+| Email anonymization bị bypass (G-006) | High | Lộ thông tin đăng ký email → vi phạm privacy policy |
+| Token reset password reusable (KT-05) | High | Attacker dùng lại link cũ để đổi mật khẩu user |
+| Password rule mâu thuẫn MSG-015 vs MSG-019 (G-043/G-048) | High | FE/BE validate khác nhau → user không biết rule nào đúng |
 
 ### Data Risk
 
-| Risk | Impact | Why it matters |
-|------|--------|---------------|
-| OTP case-sensitive không được enforce đúng | High | User nhập đúng nhưng bị từ chối hoặc ngược lại |
-| Token binding không đúng user/email | High | Token của user A dùng được cho user B |
-| Password lưu plaintext thay vì hash | High | Data breach nghiêm trọng |
-| `{{ユーザー名}}` null trong email template | Medium | Email gửi ra bị lỗi format — **[G-017 PENDING]** |
+| Risk | Impact | Lý do |
+|------|--------|-------|
+| OTP case-sensitive không nhất quán FE/BE | High | User nhập đúng nhưng BE reject → không login được |
+| Password hash không đúng (L-05 §5.4) | High | Mật khẩu lưu plaintext → data breach |
+| Token binding không rõ (G-018) | Medium | Token không gắn với account → có thể dùng cho account khác |
 
 ### Integration Risk
 
-| Risk | Impact | Why it matters |
-|------|--------|---------------|
-| SMTP down khi 2FA ON | High | User không nhận được OTP, không đăng nhập được — **[G-014 PENDING]** |
-| API auth không trả đúng error code → MSG mapping sai | High | UI hiển thị sai message |
-| Reset URL token không match BE validation | Medium | L-05 hiển thị expired error dù link còn hạn |
+| Risk | Impact | Lý do |
+|------|--------|-------|
+| Email service SMTP down khi 2FA ON (G-014) | High | User không nhận OTP → không login được, không có fallback |
+| API error mapping chưa đầy đủ (G-005) | High | Lỗi BE không map đúng MSG code → hiển thị sai hoặc crash |
+| Session management sau OTP (G-027) | Medium | Multi-tab / session override không rõ |
 
 ### Technical Risk
 
-| Risk | Impact | Why it matters |
-|------|--------|---------------|
-| Cooldown 60s tính phía client thay vì server | High | Dễ bypass bằng cách clear state |
-| Session không invalidate sau reset password | High | Old session vẫn active sau đổi mật khẩu |
-| Back navigation từ L-06 → L-05 với token đã dùng | Medium | Error state không được handle — **[G-051 PENDING]** |
-| L-02 không có back navigation | Medium | User bị kẹt nếu nhập sai email ở L-01 — **[G-043 PENDING]** |
+| Risk | Impact | Lý do |
+|------|--------|-------|
+| L-06 spec trống (G-044) | High | Không có spec để implement và test |
+| Back navigation từ L-06 về L-05 (G-051) | Medium | Token expired error hiển thị không đúng context |
+| Rate limiting theo IP/device chưa có (G-034) | Medium | Không có captcha/rate limit → brute force risk |
 
 ---
 
@@ -107,22 +92,22 @@ references:
 
 ### In Scope
 
-- Toàn bộ luồng L-01 → L-06 (happy path + error path)
-- Validation rules: email format, password format (L-01 và L-05), OTP format
-- Lockout logic: 5 lần sai / 30 phút
-- 2FA flow: OTP gửi, verify, resend, cooldown
-- Reset password flow: gửi email, token validity, đặt mật khẩu mới
-- Message display: MSG-001/003/004/007/014/016/017/018/019/021
-- Security: email anonymization, token one-time-use, session invalidation
-- UI behavior: button enable/disable, error display position, trim whitespace
+- Toàn bộ 6 màn hình L-01 → L-06: functional flow, validation, error handling
+- MSG codes: trigger đúng điều kiện, wording đúng D-00
+- 2FA ON/OFF flow
+- Lockout: trigger, duration, reset conditions
+- OTP: generate, verify, resend, cooldown, expiry
+- Reset password: email send, token validation, password format, token one-time-use
+- Security: email anonymization, password hashing, token expiry
+- FE/BE validation consistency
 
 ### Out of Scope
 
-- T-01 và các màn hình sau khi đăng nhập thành công
-- Admin flow tạo user mới (chỉ test luồng user nhận email thiết lập mật khẩu lần đầu từ L-03)
-- Email server infrastructure (chỉ test behavior khi email gửi thành công/thất bại)
-- Audit log implementation chi tiết (**[G-026 PENDING]**)
-- Performance testing (NFR chưa chốt — **[G-010 PENDING]**)
+- T-01 và các màn hình sau khi login thành công
+- Email delivery SLA (phụ thuộc SMTP provider)
+- Admin tạo user (màn hình M-08-cud)
+- Performance load testing (chưa có SLA chính thức — G-010)
+- Accessibility chi tiết (G-036 — pending)
 
 ---
 
@@ -130,50 +115,50 @@ references:
 
 ### Test Levels
 
-| Level | Áp dụng cho |
-|-------|------------|
-| System Test | Toàn bộ L-01 → L-06, end-to-end flow |
-| Integration Test | API auth, OTP verify, reset password API, email trigger |
-| UAT | Happy path L-01 (2FA ON/OFF), reset password flow |
+| Level | Áp dụng cho | Ghi chú |
+|-------|-------------|---------|
+| System Test | Toàn bộ L-01 → L-06 | Luồng end-to-end, integration với BE/email |
+| Integration Test | L-01↔L-02, L-03↔L-04↔L-05↔L-06, API auth | FE↔BE, BE↔Email service |
+| UAT | Happy path login, reset password | Với user thực tế quyền 管理/物流 |
 
 ### Test Types
 
-| Type | Nội dung |
+| Type | Phạm vi |
 |------|---------|
-| Functional | Tất cả flow chính và error path theo spec |
-| Security | Email enumeration, token reuse, session invalidation, brute-force lockout |
-| Boundary | OTP 6 ký tự (5/6/7), password min 12 ký tự (11/12/13), max 50 ký tự loginID |
-| Negative | Sai password, OTP hết hạn, token đã dùng, email không tồn tại |
-| UI/UX | Button state, error message position, trim whitespace, placeholder |
+| Functional | Tất cả flow, validation, error handling, MSG codes |
+| Security | Email anonymization, token one-time-use, password hash, lockout |
+| Negative | Sai credential, OTP sai/hết hạn, token expired/reused, rate limit |
+| Boundary | Max length fields, OTP 6 ký tự, lockout counter 4→5, cooldown 59s→60s |
+| Regression | Sau mỗi fix bug liên quan auth flow |
 
 ---
 
 ## 6. Test Focus Areas
 
 ### Critical Logic
-- Lockout counter: reset đúng điều kiện (login success / password reset / timeout)
-- 2FA session: chỉ cho phép vào L-02 khi có pending session hợp lệ
-- Token: one-time-use, expire 24h, invalidate sau dùng
-- Password hash: không lưu plaintext
+- Lockout: đếm đúng 5 lần liên tiếp, reset đúng điều kiện (success login / password reset / timeout)
+- OTP: case-sensitive verify, one-time-use, 24h expiry, cooldown 60s
+- Token reset: one-time-use, 24h expiry, binding với account
+- 2FA ON/OFF routing: đúng màn hình đích
 
 ### Complex Validation
-- OTP: 6 ký tự, 半角英数字, **phân biệt hoa/thường** — test A≠a
-- Password L-05: min 12, phải có uppercase + lowercase + digit + symbol (@$!%*?&)
-- Email: format validation FE và BE phải match
-- Trim whitespace: áp dụng cho loginID, email, OTP — nhưng **không trim password** nếu password có intentional spaces (**[G-013 PENDING]**)
+- Password L-05: min 12 ký tự, phải có uppercase + lowercase + digit + special char (`@$!%*?&`)
+- Email format: L-01 (max 50) và L-03/L-04 (MSG-004) — cần thống nhất rule
+- OTP format: 6 ký tự, half-width alphanumeric, case-sensitive
 
 ### Edge Cases
 - OTP resend trong cooldown 60s → MSG-016
-- Reset email gửi cho email không tồn tại → vẫn show L-04 (anonymization)
+- Reset mail gửi lại khi link cũ còn hiệu lực (G-019)
 - Truy cập trực tiếp L-02/L-04/L-05 không có session/token hợp lệ
-- Back browser từ L-06 → L-05 với token đã dùng
-- Lockout user cố reset password → vẫn cho phép reset flow
+- Back browser từ L-06 về L-05 với token đã dùng
+- Paste OTP > 6 ký tự (G-008)
+- Password có leading/trailing space (G-013, G-047)
 
 ### High-risk Data Scenarios
-- Password chứa tất cả ký tự đặc biệt cho phép: `@$!%*?&`
-- OTP chứa cả chữ hoa và thường: `aA1bB2`
-- Email với `+` và subdomain dài
-- Token URL bị modify/truncate
+- Email không tồn tại trong hệ thống → L-03 vẫn redirect L-04 (anonymization)
+- Token hết hạn 24h → L-05 hiển thị error đúng
+- Lockout user cố đăng nhập → MSG-021, không phải MSG-003
+- Password mới trùng password cũ (G-045 — pending confirm)
 
 ---
 
@@ -181,32 +166,32 @@ references:
 
 ### Key Data Cần Chuẩn Bị
 
-| Loại | Data | Mục đích |
-|------|------|---------|
-| User 2FA ON | email + password hợp lệ | Test luồng L-01 → L-02 → T-01 |
-| User 2FA OFF | email + password hợp lệ | Test luồng L-01 → T-01 trực tiếp |
-| User chưa có password | account mới do admin tạo | Test first-time password setup qua L-03 |
-| User bị lockout | account đã sai 5 lần | Test MSG-021 và lockout behavior |
-| Email không tồn tại | email@nonexistent.com | Test anonymization L-03/L-04 |
-| OTP hợp lệ | lấy từ email thực | Test verify thành công |
-| OTP hết hạn | OTP > 24h | Test MSG-014 |
-| Token reset hợp lệ | từ email reset | Test L-05 thành công |
-| Token đã dùng | token sau khi đã reset | Test error state L-05 |
-| Token hết hạn | token > 24h | Test error state L-05 |
+| Data | Mô tả |
+|------|-------|
+| User 2FA ON | Account với 2FA bật, email hợp lệ nhận OTP |
+| User 2FA OFF | Account với 2FA tắt |
+| User chưa có password | Account mới do admin tạo (luồng first-time setup) |
+| User bị lock | Account đã bị lockout (hoặc trigger lockout trong test) |
+| Token hợp lệ | Token reset password chưa dùng, còn trong 24h |
+| Token hết hạn | Token > 24h |
+| Token đã dùng | Token đã dùng 1 lần |
+| Email không tồn tại | Email chưa đăng ký trong hệ thống |
 
 ### Edge Case Data
 
-- Password đúng 12 ký tự: `Abcdef1@ghij`
-- Password 11 ký tự (invalid): `Abcdef1@ghi`
-- Password thiếu symbol: `Abcdefgh1234`
-- OTP uppercase: `ABC123` vs lowercase: `abc123` (phải khác nhau)
-- LoginID max 50 ký tự
-- LoginID 51 ký tự (invalid)
+| Data | Mục đích |
+|------|---------|
+| Email 50 ký tự (max) | Boundary test L-01 |
+| Email 51 ký tự | Boundary test L-01 — expect error |
+| OTP đúng nhưng uppercase/lowercase sai | Case-sensitive test L-02 |
+| Password đúng 12 ký tự, đủ 4 loại | Boundary pass L-05 |
+| Password 11 ký tự | Boundary fail L-05 — MSG-019 |
+| Password thiếu 1 loại ký tự | Complexity fail L-05 — MSG-019 |
 
 ### Data Dependencies
-- Cần môi trường test có SMTP thực hoặc mock email service
-- Cần account với 2FA ON và 2FA OFF riêng biệt
-- Cần khả năng reset lockout counter giữa các test run
+- Email service phải hoạt động để nhận OTP và reset link
+- BE phải expose API để reset lockout counter trong môi trường test
+- Token generation phải có cách tạo token expired cho test
 
 ---
 
@@ -216,73 +201,79 @@ references:
 
 | Item | Lý do |
 |------|-------|
-| Happy path L-01 (2FA OFF) | Chạy mỗi regression, ổn định |
-| Validation rules: email format, password format | Rule cố định, dễ parameterize |
-| Boundary test: OTP length, password length | Data-driven, nhiều case |
-| Lockout counter (5 lần sai) | Cần chạy nhiều lần, tốn thời gian manual |
-| Token expiry check | Cần control time, khó test manual |
+| Happy path login (2FA ON/OFF) | Chạy mỗi regression, stable flow |
+| Validation rules (email format, password format, OTP format) | Rule cố định, nhiều boundary case |
+| MSG code trigger đúng điều kiện | Dễ automate, dễ regression |
+| Token expiry check | Cần time-based test, khó manual |
+| Lockout counter (5 lần) | Repetitive, dễ automate |
 
 ### Nên Manual
 
 | Item | Lý do |
 |------|-------|
-| Email nhận thực tế (OTP, reset link) | Phụ thuộc SMTP, khó automate ổn định |
-| UI/UX: error position, button state, placeholder | Cần visual verification |
-| 2FA flow end-to-end | Phụ thuộc email timing |
-| Security: email enumeration | Cần judgment, không chỉ assert response |
+| Email nhận thực tế (OTP, reset link) | Phụ thuộc email service, khó assert nội dung |
+| UI/UX: error banner position, focus management | Cần visual check |
 | Back navigation behavior | Browser-specific behavior |
+| First-time password setup flow | Cần admin setup, ít lặp lại |
+| Các TC liên quan gap chưa confirm | Spec chưa chốt, dễ thay đổi |
 
 ---
 
 ## 9. Entry / Exit Criteria
 
 ### Entry Criteria
-- [ ] Môi trường test deploy xong với SMTP mock hoặc real
-- [ ] Test data (accounts, tokens) đã được chuẩn bị
-- [ ] API spec cho auth/OTP/reset đã có (hoặc mock API sẵn sàng)
-- [ ] Các gap **High risk** đã được confirm (xem Section 10)
+- Spec L-01 → L-05 đã review và sign-off (L-06 cần bổ sung — G-044)
+- Môi trường test có email service hoạt động
+- API auth endpoints đã deploy và có test account
+- D-00 Message definition đã chốt (G-039 — pending)
 
 ### Exit Criteria
-- [ ] 100% test case cho KT-01 → KT-07 (High priority) đã pass
-- [ ] 0 bug severity Critical/High còn open
-- [ ] Security test cases (email enumeration, token reuse, session invalidation) đã pass
-- [ ] Regression test pass sau mỗi fix
+- 100% TC happy path pass
+- 100% TC security critical pass (lockout, token one-time-use, email anonymization)
+- 0 bug severity Critical/High còn open
+- Các TC liên quan gap pending được mark `[PENDING: G-xxx]` và có sign-off từ BA/Dev trước khi close
 
 ---
 
 ## 10. Gaps & Questions
 
-### Chưa Confirmed — `Need confirm spec?`
-
-| Gap | Nội dung | Impact nếu không confirm |
-|-----|---------|--------------------------|
-| **G-001** | Lockout counter reset tại những sự kiện nào? OTP fail có ảnh hưởng counter không? | Block test case lockout logic |
-| **G-004** | OTP validity chính thức (24h?), one-time-use bắt buộc? OTP cũ invalidate khi resend? | Block test case OTP expiry |
-| **G-005** | API spec + error code mapping → MSG-xxx cho tất cả màn | Block integration test |
-| **G-006** | Email không tồn tại / bị limit / lỗi hệ thống: UI thống nhất thế nào để không leak? | Block security test |
-| **G-007** | Rule email hợp lệ thống nhất (RFC level, có cho `+`/IDN không?) | Block validation test |
-| **G-009** | First-time password setup: dùng cùng L-03/L-04 hay khác wording/behavior? | Block test case first-time setup |
-| **G-013** | Trim whitespace: password có intentional spaces có bị trim không? | Block boundary test password |
-| **G-014** | SMTP down khi 2FA ON: hiển thị MSG nào? Có fallback không? | Block test case 2FA error |
-| **G-019** | Khi resend reset mail: link cũ còn hiệu lực không? | Block security test token |
-| **G-023** | Password rule chính thức: min 12 hay min 8? MSG-015 vs MSG-019 mâu thuẫn | **Block toàn bộ password test** |
-| **G-041** | LoginID: email-only hay cả ユーザーID? Placeholder Figma mâu thuẫn spec | Block validation test loginID |
-| **G-044** | L-01 spec: L-06 hoàn toàn trống — cần spec đầy đủ | Block test case L-06 |
-| **G-046** | L-04: có link quay lại L-01 không? Figma thiếu element này | Block UI test L-04 |
-| **G-047** | L-05: label ô confirm password — Figma dùng label giống ô đầu | Block UI test L-05 |
-| **G-048** | MSG-019 wording: D-00 vs Figma khác nhau về complexity rule | **Block toàn bộ password reset test** |
-| **G-051** | Back navigation từ L-06 → L-05: redirect L-01 hay show error? | Block navigation test |
-
-### Đã Confirmed (từ requirement docs)
+### ✅ Đã Confirmed từ Requirement
 
 | Gap | Nội dung | Nguồn |
-|-----|---------|-------|
-| ✅ OTP format | 6 ký tự, 半角英数字, phân biệt hoa/thường | L-02 §1, MSG-014, MSG-017 |
-| ✅ Cooldown resend OTP | 60 giây / lần, MSG-016 | L-02 §3 No.5 |
-| ✅ Lockout rule | 5 lần sai liên tiếp → 30 phút, MSG-021 | L-01 §5 |
-| ✅ Reset email anonymization | Không lộ email đã đăng ký, luôn show L-04 | L-03 §5 Bảo mật |
-| ✅ Token expiry | 24 giờ kể từ phát hành | L-03 §5 email template, L-05 §5.4 |
-| ✅ Password hash | Lưu DB chỉ bản băm | L-05 §3 No.3 |
-| ✅ Password rule L-05 | Min 12, uppercase+lowercase+digit+symbol | L-05 §5.1 |
-| ✅ MSG-007 wording | パスワードが一致していません | D-00 No.7 |
-| ✅ Cooldown reset email | 60 giây / lần | L-03 §5 Giới hạn gửi lại |
+|-----|----------|-------|
+| OTP validity | 24 giờ kể từ lúc phát hành | L-01 email template + MSG-014 |
+| OTP case-sensitive | Phân biệt hoa/thường khi verify | L-02 §1 + MSG-014 |
+| Cooldown resend OTP | 60 giây / lần | L-02 §3 No.5 |
+| Cooldown reset mail | 60 giây / lần | L-03 §1 |
+| Email anonymization | Không lộ email đã đăng ký | L-03 §5 Bảo mật |
+| Password format L-05 | Min 12 ký tự, uppercase+lowercase+digit+special | L-05 §5.1 |
+| Token one-time-use | Dùng một lần, 24h | L-05 §5.4 |
+| Password hash | Lưu DB dạng hash | L-05 §5.4 |
+| MSG-007 wording | パスワードが一致していません | D-00 No.7 |
+| MSG-019 wording | 12文字以上の半角英数字・記号で、大文字・小文字・数字・記号をすべて含めて入力してください。 | D-00 No.19 |
+| Lockout rule | 5 lần sai liên tiếp → lock 30 phút | L-01 §5 |
+
+### ⚠ Partially Confirmed
+
+| Gap | Nội dung | Phần còn pending |
+|-----|----------|-----------------|
+| G-032 | Reset mail limit 5 lần/giờ (tạm thời) | Cách đếm (rolling window?), key theo email hay userId, response khi vượt limit |
+| G-018 | Token binding với account | Chi tiết token format, IP/device binding — do BE quyết định |
+| G-003 | Điều kiện session hợp lệ để ở L-02 | Cơ chế session cụ thể (cookie/JWT) chưa chốt |
+
+### ❗ Need Confirm Spec — Cần BA/Dev xác nhận trước khi viết TC
+
+| Gap | Category | Nội dung | Impact nếu không confirm |
+|-----|----------|----------|--------------------------|
+| **G-044** | Functional | **L-06 spec hoàn toàn trống** — không có element list, behavior, error handling | Block viết TC cho L-06 |
+| **G-043** | Validation | **Mâu thuẫn rule password**: MSG-015 (L-01, min 8) vs MSG-019 (L-05, min 12) | TC validation password sẽ sai nếu rule không thống nhất |
+| **G-048** | UI-UX | **Wording MSG-019 khác nhau** giữa Figma và D-00 (Figma không đề cập uppercase/lowercase) | Implement sai complexity rule |
+| **G-047** | UI-UX | **Label ô confirm password L-05** giống ô đầu (`新しいパスワード`) — không có `確認` | TC không phân biệt được 2 ô |
+| **G-046** | UI-UX | **L-04 thiếu link quay lại L-01** theo spec nhưng Figma không có | TC navigation L-04 không rõ expected result |
+| **G-041** | UI-UX | **Placeholder L-01**: `メールアドレス または ユーザーID` — mâu thuẫn rule email-only | TC validation loginID không rõ rule |
+| **G-001** | Business Logic | **Lockout counter reset**: OTP fail có ảnh hưởng counter không? Có lockout riêng cho OTP không? | TC lockout scenario không đầy đủ |
+| **G-019** | Business Logic | **Link reset cũ có còn hiệu lực khi resend mail không?** | TC token invalidation không rõ expected |
+| **G-045** | Functional | **Mật khẩu mới có được trùng mật khẩu cũ không?** | Thiếu TC negative cho case này |
+| **G-005** | Integration | **API error mapping** cho tất cả màn auth chưa có | TC error handling không đầy đủ |
+| **G-014** | Functional | **SMTP down khi 2FA ON**: fallback behavior? MSG code? | TC integration failure không rõ expected |
+| **G-010** | Non-functional | **SLA/timeout chính thức** cho API auth | TC performance không có baseline |

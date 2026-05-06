@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TCs_M-02_Area_ver1.md</title>
+<style>
+  *,*::before,*::after { box-sizing: border-box; }
+  html,body { margin:0; padding:0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+    background:#f1f5f9; color:#0f172a; line-height:1.45; font-size: 13px;
+  }
+
+  /* ============ HEADER ============ */
+  header.app-header {
+    position: sticky; top: 0; z-index: 60;
+    background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 16px 8px;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.04);
+  }
+  .header-row { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .header-title h1 { font-size: 15px; font-weight:700; margin:0 0 2px; color:#0f172a; }
+  .header-title .sub { font-size: 11.5px; color:#64748b; }
+  .header-title .sub b { color:#334155; }
+
+  .stats { display:flex; gap:6px; flex-wrap:wrap; }
+  .stat-card {
+    background:#fff; border:1px solid #e2e8f0; border-radius:7px;
+    padding:5px 11px; min-width:72px; text-align:center;
+    transition: transform .12s;
+  }
+  .stat-card:hover { transform: translateY(-1px); }
+  .stat-card .lbl { font-size: 9.5px; color:#64748b; text-transform:uppercase; letter-spacing:.5px; font-weight:600; }
+  .stat-card .val { font-size: 16px; font-weight:700; color:#0f172a; line-height:1.1; margin-top:1px; }
+  .stat-card .pct { font-size: 9.5px; color:#94a3b8; margin-top:1px; }
+  .stat-total   { border-top:3px solid #1e293b; }
+  .stat-pass    { border-top:3px solid #10b981; }
+  .stat-fail    { border-top:3px solid #ef4444; }
+  .stat-impact  { border-top:3px solid #f59e0b; }
+  .stat-notrun  { border-top:3px solid #6b7280; }
+  .stat-open    { border-top:3px solid #3b82f6; }
+
+  .progress-wrap { margin-top: 8px; display:flex; align-items:center; gap:10px; }
+  .progress-bar { flex:1; height:7px; background:#e2e8f0; border-radius:4px; overflow:hidden; display:flex; }
+  .progress-bar > span { height:100%; transition: width .3s; }
+  .progress-bar .pf-pass    { background:#10b981; }
+  .progress-bar .pf-fail    { background:#ef4444; }
+  .progress-bar .pf-impact  { background:#f59e0b; }
+  .progress-bar .pf-notrun  { background:#6b7280; }
+  .progress-text { font-size:11.5px; color:#475569; font-weight:600; min-width:140px; text-align:right; }
+
+  /* ============ FILTER BAR ============ */
+  .filter-bar {
+    background:#fff; padding:8px 16px;
+    border-bottom:1px solid #e2e8f0;
+    display:flex; gap:6px; flex-wrap:wrap; align-items:center;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .filter-bar input, .filter-bar select {
+    padding: 5px 9px; border:1px solid #cbd5e1; border-radius:5px;
+    font-size: 12.5px; font-family:inherit; background:#fff; color:#0f172a;
+  }
+  .filter-bar input[type="search"] { flex:1; min-width:200px; max-width:380px; }
+  .filter-bar input[type="search"]:focus, .filter-bar select:focus {
+    outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.15);
+  }
+  .filter-bar .btn {
+    padding: 5px 11px; border:1px solid #cbd5e1; background:#fff;
+    border-radius:5px; cursor:pointer; font-size:12.5px; color:#0f172a;
+    transition: background .12s;
+  }
+  .filter-bar .btn:hover { background:#f8fafc; }
+  .filter-bar .btn-primary { background:#1e40af; color:#fff; border-color:#1e40af; }
+  .filter-bar .btn-primary:hover { background:#1e3a8a; }
+  .filter-bar .btn-danger { color:#b91c1c; border-color:#fecaca; }
+  .filter-bar .btn-danger:hover { background:#fef2f2; }
+  .result-count { font-size:11.5px; color:#64748b; margin-left:auto; }
+
+  /* section collapse toggle */
+  .section-fold { display:flex; gap:2px; border:1px solid #cbd5e1; border-radius:5px; overflow:hidden; }
+  .section-fold button {
+    background:#fff; border:none; padding: 5px 9px;
+    cursor:pointer; font-size: 11.5px; color:#475569;
+    font-family: inherit;
+  }
+  .section-fold button:hover { background:#f8fafc; }
+
+  /* ============ MAIN ============ */
+  main { padding: 12px 16px 60px; }
+
+  .section-block { margin-bottom: 22px; }
+
+  .section-header {
+    margin: 0 0 6px;
+    padding: 6px 12px;
+    background: #1e293b; color: #fff;
+    border-radius: 6px 6px 0 0;
+    font-size: 13px; font-weight: 600; letter-spacing: .3px;
+    display:flex; justify-content:space-between; align-items:center;
+    cursor: pointer; user-select: none;
+  }
+  .section-header .sec-count { font-size: 11.5px; opacity: .85; font-weight: 500; }
+  .section-header .toggle-icon {
+    display: inline-block; margin-right: 6px; font-size: 14px;
+    transition: transform .2s; line-height: 1; flex-shrink: 0;
+  }
+  .section-block.collapsed .toggle-icon { transform: rotate(-90deg); }
+  .section-block.collapsed .table-wrap { display: none; }
+
+  /* subgroup collapse */
+  tr.subgroup-row { cursor: pointer; user-select: none; }
+  .sg-toggle-icon {
+    display: inline-block; margin-right: 5px; font-size: 11px;
+    transition: transform .2s; line-height: 1;
+  }
+  tbody.subgroup-block.collapsed .sg-toggle-icon { transform: rotate(-90deg); }
+  tbody.subgroup-block.collapsed tr.tc-row { display: none; }
+
+  .table-wrap {
+    background:#fff; border:1px solid #e2e8f0;
+    border-top: none; border-radius: 0 0 6px 6px;
+    overflow-x: auto;
+  }
+
+  table.tc-table {
+    width: 100%;
+    min-width: 1900px;
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed;
+  }
+  table.tc-table thead th {
+    background: #f1f5f9;
+    border-bottom: 2px solid #cbd5e1;
+    padding: 7px 8px;
+    text-align: left;
+    font-weight: 700;
+    color: #334155;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    position: sticky; top: 0;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  table.tc-table tbody td {
+    padding: 7px 8px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  table.tc-table tbody tr.subgroup-row td {
+    background: #eef2ff;
+    color: #3730a3;
+    font-weight: 600;
+    font-size: 11.5px;
+    padding: 5px 10px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    border-bottom: 1px solid #c7d2fe;
+  }
+  table.tc-table tbody tr.tc-row { transition: background .08s; }
+  table.tc-table tbody tr.tc-row:hover td { background: #fafbfc; }
+
+  /* row status colors (left border via first cell) */
+  tr.tc-row td.col-tcid { border-left: 4px solid #93c5fd; }
+  tr.tc-row.s-pass    td.col-tcid { border-left-color: #10b981; }
+  tr.tc-row.s-fail    td.col-tcid { border-left-color: #ef4444; }
+  tr.tc-row.s-impact  td.col-tcid { border-left-color: #f59e0b; }
+  tr.tc-row.s-notrun  td.col-tcid { border-left-color: #6b7280; }
+  tr.tc-row.s-open    td.col-tcid { border-left-color: #3b82f6; }
+
+  /* column widths */
+  .col-tcid     { width: 130px; }
+  .col-tvp      { width: 78px; }
+  .col-subsec   { width: 100px; }
+  .col-pri      { width: 75px; }
+  .col-type     { width: 85px; }
+  .col-desc     { width: 220px; }
+  .col-pre      { width: 175px; }
+  .col-steps    { width: 220px; }
+  .col-data     { width: 115px; }
+  .col-expected { width: 220px; }
+  .col-specnote { width: 180px; }
+  .col-status   { width: 105px; }
+  .col-actual   { width: 180px; }
+  .col-mynote   { width: 160px; }
+
+  /* multi-line content */
+  .multi-line > div + div { margin-top: 2px; }
+  .muted { color:#94a3b8; }
+
+  /* badges */
+  .badge {
+    display:inline-block; padding: 1px 6px; border-radius:4px;
+    font-size: 10.5px; font-weight:700; white-space:nowrap; line-height:1.5;
+  }
+  .badge-tc  { background:#1e40af; color:#fff; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+  .badge-tvp { background:#6366f1; color:#fff; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+  .badge-pri-Critical { background:#dc2626; color:#fff; }
+  .badge-pri-High     { background:#ea580c; color:#fff; }
+  .badge-pri-Medium   { background:#d97706; color:#fff; }
+  .badge-pri-Low      { background:#65a30d; color:#fff; }
+  .badge-type { background:#e2e8f0; color:#334155; }
+
+  code.inline-code {
+    background:#eef2ff; color:#3730a3;
+    padding:1px 5px; border-radius:3px;
+    font-family: ui-monospace, Consolas, monospace; font-size: 11px;
+  }
+
+  /* status select */
+  .status-select {
+    width: 100%;
+    padding: 4px 6px; border:1px solid #cbd5e1; border-radius:5px;
+    font-size: 11.5px; font-weight:700; cursor:pointer;
+    font-family: inherit;
+  }
+  .status-select.s-pass    { background:#d1fae5; color:#065f46; border-color:#10b981; }
+  .status-select.s-fail    { background:#fee2e2; color:#991b1b; border-color:#ef4444; }
+  .status-select.s-impact  { background:#fef3c7; color:#92400e; border-color:#f59e0b; }
+  .status-select.s-notrun  { background:#f3f4f6; color:#374151; border-color:#9ca3af; }
+  .status-select.s-open    { background:#eff6ff; color:#1d4ed8; border-color:#3b82f6; }
+
+  /* textareas in cells */
+  td textarea {
+    width: 100%;
+    min-height: 50px;
+    padding: 5px 7px;
+    border:1px solid #cbd5e1; border-radius: 4px;
+    font-size: 11.5px; font-family: inherit;
+    resize: vertical;
+    background:#fff; color:#0f172a;
+    line-height: 1.4;
+  }
+  td textarea:focus {
+    outline:none; border-color:#3b82f6;
+    box-shadow:0 0 0 2px rgba(59,130,246,.15);
+  }
+  /* Note cell: single editable textarea (seeded with spec note on first load) */
+  td.col-specnote textarea.note-edit {
+    min-height: 60px;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  td.col-specnote textarea.note-edit::placeholder { color:#94a3b8; font-style: italic; }
+
+  /* Actual is required when status = Fail */
+  td textarea.required-empty {
+    border-color:#ef4444; background:#fef2f2;
+    box-shadow: 0 0 0 1px #fecaca inset;
+  }
+  td textarea.required-empty::placeholder { color:#ef4444; opacity:.85; }
+  tr.tc-row.needs-actual td.col-actual::after {
+    content: '⚠ Required';
+    display: block;
+    margin-top: 3px;
+    font-size: 10px; font-weight: 700; color: #b91c1c;
+  }
+
+  /* hidden */
+  .hidden { display:none !important; }
+
+  /* empty state */
+  .empty-state {
+    text-align:center; padding: 60px 20px; color:#94a3b8; font-size: 14px;
+  }
+
+  /* toast */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px; z-index: 100;
+    background: #0f172a; color: #fff;
+    padding: 10px 16px; border-radius: 6px;
+    font-size: 13px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .2s, transform .2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity:1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-row">
+    <div class="header-title">
+      <h1>TCs_M-02_Area_ver1.md</h1>
+      <div class="sub">
+        <b>Màn hình:</b> M-02 — エリア管理 (Quản lý khu vực)
+        
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat-card stat-total"><div class="lbl">Total</div><div class="val" id="st-total">0</div></div>
+      <div class="stat-card stat-pass"><div class="lbl">Pass</div><div class="val" id="st-pass">0</div><div class="pct" id="st-pass-pct">0%</div></div>
+      <div class="stat-card stat-fail"><div class="lbl">Fail</div><div class="val" id="st-fail">0</div><div class="pct" id="st-fail-pct">0%</div></div>
+      <div class="stat-card stat-impact"><div class="lbl">Impact</div><div class="val" id="st-impact">0</div></div>
+      <div class="stat-card stat-notrun"><div class="lbl">Not Run</div><div class="val" id="st-notrun">0</div></div>
+      <div class="stat-card stat-open"><div class="lbl">Open</div><div class="val" id="st-open">0</div></div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar">
+      <span class="pf-pass"    id="pf-pass"    style="width:0%"></span>
+      <span class="pf-fail"    id="pf-fail"    style="width:0%"></span>
+      <span class="pf-impact"  id="pf-impact"  style="width:0%"></span>
+      <span class="pf-notrun"  id="pf-notrun"  style="width:0%"></span>
+    </div>
+    <div class="progress-text" id="progress-text">0% tested</div>
+  </div>
+</header>
+
+<div class="filter-bar">
+  <input type="search" id="search" placeholder="🔍 Tìm theo TC ID, mô tả, steps, expected... (phím /)" autocomplete="off">
+  <select id="filter-section"><option value="">All sections</option></select>
+  <select id="filter-status">
+    <option value="">All status</option>
+    <option value="open">Open</option>
+    <option value="pass">Pass</option>
+    <option value="fail">Fail</option>
+    <option value="impact">Impact</option>
+    <option value="notrun">Not Run</option>
+  </select>
+  <select id="filter-priority"><option value="">All priority</option></select>
+  <select id="filter-type"><option value="">All type</option></select>
+  <span class="section-fold" title="Thu gọn / Mở rộng tất cả section">
+    <button id="btn-expand-all" type="button">▾ Expand All</button>
+    <button id="btn-collapse-all" type="button">▸ Collapse All</button>
+  </span>
+  <button class="btn btn-primary" id="btn-export">Export JSON</button>
+  <button class="btn" id="btn-export-csv">Export XLS</button>
+  <button class="btn" id="btn-export-md">Export MD</button>
+  <button class="btn" id="btn-import">Import</button>
+  <button class="btn btn-danger" id="btn-reset">Reset</button>
+  <input type="file" id="import-file" accept=".json" style="display:none">
+  <span class="result-count" id="result-count"></span>
+</div>
+
+<main id="main"></main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const META = {"docTitle":"TCs_M-02_Area_ver1.md","screenName":"M-02 — エリア管理 (Quản lý khu vực)","tvpVersion":"","sourceFile":"TCs_M-02_Area_ver1.md","storageKey":"tc_state__TCs_M-02_Area_ver1","total":126,"generatedAt":"2026-05-05T10:09:52.990Z"};
+const TEST_DATA = [{"tcId":"TC-AREA-S01-001","tvpId":"TVP-001","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Cột No. hiển thị trong bảng danh sách","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load tại `/area`<br>3. DB có ít nhất 1 Area chưa xóa mềm","steps":"1. Navigate đến `/area`<br>2. Chờ bảng danh sách load xong<br>3. Quan sát header bảng","data":"—","expected":"1. Bảng có cột No. hiển thị số thứ tự<br>2. Giá trị bắt đầu từ 1","type":"","priority":"","actualSpec":"[⚠️ Need Confirm G-005]: No. là row-index FE generate hay field từ API?","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S01-002","tvpId":"TVP-001","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Cột エリアID hiển thị trong bảng danh sách","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load tại `/area`","steps":"1. Navigate đến `/area`<br>2. Quan sát header bảng","data":"—","expected":"1. Cột header「エリアID」hiển thị<br>2. Cột chứa giá trị `m_areas.code`","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S01-003","tvpId":"TVP-001","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Cột エリア名 hiển thị trong bảng danh sách","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load tại `/area`","steps":"1. Navigate đến `/area`<br>2. Quan sát header bảng","data":"—","expected":"1. Cột header「エリア名」hiển thị<br>2. Cột chứa giá trị `m_areas.name`","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S01-004","tvpId":"TVP-001","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Cột ステータス hiển thị trong bảng danh sách","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load tại `/area`","steps":"1. Navigate đến `/area`<br>2. Quan sát header bảng","data":"—","expected":"1. Cột header「ステータス」hiển thị<br>2. Cột chứa giá trị「有効」hoặc「無効」","type":"","priority":"","actualSpec":"[⚠️ Mock≠Spec G-001]: spec không đề cập cột ステータス — follow UI mockup","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S01-005","tvpId":"TVP-001","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Cột クライアント名 hiển thị trong bảng danh sách","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load tại `/area`","steps":"1. Navigate đến `/area`<br>2. Quan sát header bảng","data":"—","expected":"1. Cột header「クライアント名」hiển thị<br>2. Cột chứa tên khách hàng tương ứng","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S01-006","tvpId":"TVP-001","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Cột 編集 (nút sửa) hiển thị trong bảng danh sách","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load tại `/area`<br>3. DB có ít nhất 1 Area","steps":"1. Navigate đến `/area`<br>2. Quan sát mỗi dòng trong bảng","data":"—","expected":"1. Mỗi dòng có nút「編集」<br>2. Nút hiển thị đúng vị trí (cột cuối hoặc theo mockup)","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S01-007","tvpId":"TVP-002","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Area có status=ACTIVE hiển thị「有効」trong cột ステータス","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area với `status = 'ACTIVE'` và `deleted_at IS NULL`","steps":"1. Navigate đến `/area`<br>2. Tìm dòng Area có status ACTIVE<br>3. Quan sát cột ステータス","data":"status = ACTIVE","expected":"1. Cột ステータス hiển thị「有効」<br>2. Không hiển thị text \"ACTIVE\"","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S01-008","tvpId":"TVP-002","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Area có status=INACTIVE hiển thị「無効」trong cột ステータス","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area với `status = 'INACTIVE'` và `deleted_at IS NULL`","steps":"1. Navigate đến `/area`<br>2. Tìm dòng Area có status INACTIVE<br>3. Quan sát cột ステータス","data":"status = INACTIVE","expected":"1. Cột ステータス hiển thị「無効」<br>2. Không hiển thị text \"INACTIVE\"","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S01-009","tvpId":"TVP-003","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Area đã xóa mềm (deleted_at IS NOT NULL) không hiển thị trong danh sách","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area A với `deleted_at IS NOT NULL`<br>3. Biết code của Area A","steps":"1. Navigate đến `/area`<br>2. Tìm kiếm Area A theo code<br>3. Quan sát kết quả","data":"code của Area đã xóa mềm","expected":"1. Area A không xuất hiện trong danh sách<br>2. Không có dòng nào chứa code của Area A","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S01-010","tvpId":"TVP-004","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Area có status=INACTIVE vẫn hiển thị trong danh sách","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area với `status = 'INACTIVE'` và `deleted_at IS NULL`","steps":"1. Navigate đến `/area`<br>2. Quan sát danh sách (không filter)","data":"—","expected":"1. Area INACTIVE xuất hiện trong danh sách<br>2. Danh sách không lọc theo status","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S01-011","tvpId":"TVP-005","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Area có nhiều Delivery Center hiển thị danh sách tên center","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area X có ≥2 Delivery Center active (deleted_at IS NULL)","steps":"1. Navigate đến `/area`<br>2. Tìm dòng Area X<br>3. Quan sát vùng hiển thị centerNames","data":"—","expected":"1. Tên các Delivery Center hiển thị đúng<br>2. Thứ tự theo name ASC","type":"","priority":"","actualSpec":"[⚠️ Need Confirm G-028]: centerNames hiển thị ở cột riêng, tooltip hay vị trí khác?","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S01-012","tvpId":"TVP-005","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Area không có Delivery Center hiển thị rỗng ở vùng center","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area Y không có Delivery Center nào","steps":"1. Navigate đến `/area`<br>2. Tìm dòng Area Y<br>3. Quan sát vùng hiển thị centerNames","data":"—","expected":"1. Vùng centerNames của Area Y hiển thị rỗng (không có text)<br>2. Response API: `centerNames: []`","type":"","priority":"","actualSpec":"[⚠️ Need Confirm G-028]: vị trí hiển thị centerNames trên UI","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S01-013","tvpId":"TVP-006","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Sắp xếp mặc định khi vào màn hình là エリアID tăng dần","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ít nhất 3 Area với các code khác nhau","steps":"1. Navigate đến `/area` lần đầu (không có filter/sort đã lưu)<br>2. Quan sát thứ tự dòng trong bảng","data":"—","expected":"1. Danh sách sắp xếp theo `code` ASC<br>2. API request gửi với `sort=code,asc` (default)","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S01-014","tvpId":"TVP-007","subSection":"List Display","section":"Bảng Test Case","subGroup":"Section S01 — List Display (Danh sách)","description":"Tiêu đề màn hình hiển thị đúng","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load","steps":"1. Navigate đến `/area`<br>2. Quan sát tiêu đề trang","data":"—","expected":"1. Tiêu đề hiển thị「エリア管理」hoặc「Quản lý thông tin khu vực — Danh sách」(theo spec)<br>2. [⚠️ Need Confirm]: Confirm chính xác text theo UI thiết kế","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Low"},{"tcId":"TC-AREA-S02-001","tvpId":"TVP-008","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Filter エリアID exact match — nhập \"01\" chỉ trả area có code=\"01\"","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area code=\"01\", Area code=\"A01\", Area code=\"001\"","steps":"1. Navigate đến `/area`<br>2. Nhập \"01\" vào ô filter ID khu vực<br>3. Thực thi filter<br>4. Quan sát kết quả","data":"\"01\"","expected":"1. Chỉ Area có `code = \"01\"` xuất hiện<br>2. Area code=\"A01\" và code=\"001\" không xuất hiện<br>3. Exact match case-sensitive","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S02-002","tvpId":"TVP-008","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Filter エリアID case-sensitive — \"ABC\" không trả area có code=\"abc\"","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area code=\"abc\", không có code=\"ABC\"","steps":"1. Navigate đến `/area`<br>2. Nhập \"ABC\" vào ô filter ID khu vực<br>3. Thực thi filter","data":"\"ABC\"","expected":"1. Kết quả rỗng (content = [])<br>2. Area code=\"abc\" không xuất hiện","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S02-003","tvpId":"TVP-009","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Filter エリアID: có khoảng trắng đầu/cuối → trim trước khi tìm","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area code=\"01\"","steps":"1. Navigate đến `/area`<br>2. Nhập \"  01  \" vào ô filter ID khu vực<br>3. Thực thi filter","data":"\"  01  \" (có 2 khoảng trắng đầu và cuối)","expected":"1. Area code=\"01\" xuất hiện trong kết quả<br>2. API trim input trước khi match","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"Medium"},{"tcId":"TC-AREA-S02-004","tvpId":"TVP-010","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Filter エリアID: chỉ toàn khoảng trắng → bỏ qua điều kiện, trả tất cả","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có N Area chưa xóa mềm","steps":"1. Navigate đến `/area`<br>2. Nhập \"   \" (chỉ khoảng trắng) vào ô filter<br>3. Thực thi filter","data":"\"   \"","expected":"1. Tất cả Area chưa xóa mềm hiển thị<br>2. Điều kiện areaCode bị bỏ qua (sau trim rỗng)<br>3. Tổng bản ghi = N","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"Medium"},{"tcId":"TC-AREA-S02-005","tvpId":"TVP-011","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Filter クライアント名: chọn client X → chỉ trả area thuộc client X","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area thuộc client X và Area thuộc client Y","steps":"1. Navigate đến `/area`<br>2. Mở dropdown filter クライアント名<br>3. Chọn client X<br>4. Thực thi filter","data":"Client X","expected":"1. Chỉ Area thuộc client X xuất hiện<br>2. Area thuộc client Y không xuất hiện","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S02-006","tvpId":"TVP-012","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Kiểm tra dropdown filter クライアント名 có hiển thị client INACTIVE không","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Client với status=INACTIVE (không xóa mềm)","steps":"1. Navigate đến `/area`<br>2. Mở dropdown filter クライアント名<br>3. Quan sát danh sách client","data":"—","expected":"[⚠️ Need Confirm G-004]: Spec M-02 ghi \"tạm dừng vẫn có trong danh sách chọn\" → Client INACTIVE xuất hiện trong dropdown filter","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S02-007","tvpId":"TVP-013","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Filter Tên trung tâm (centerId): chỉ trả area có delivery center tương ứng","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area có Delivery Center X active","steps":"1. Nếu filter centerId có trên UI: chọn center X, thực thi filter<br>2. Quan sát kết quả","data":"centerId của Delivery Center X","expected":"[⚠️ Need Confirm G-003]: Filter centerId có xuất hiện trên UI không?<br>Nếu có: Chỉ Area có DC X (deleted_at IS NULL) xuất hiện","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S02-008","tvpId":"TVP-014","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Kết hợp nhiều filter (AND): エリアID + クライアント名","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area code=\"01\" thuộc client X, và Area code=\"01\" thuộc client Y","steps":"1. Navigate đến `/area`<br>2. Nhập \"01\" vào filter ID<br>3. Chọn client X trong dropdown<br>4. Thực thi filter","data":"areaCode=\"01\", clientId=client X","expected":"1. Chỉ Area code=\"01\" thuộc client X xuất hiện<br>2. Area code=\"01\" thuộc client Y không xuất hiện<br>3. AND logic áp dụng","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S02-009","tvpId":"TVP-015","subSection":"Filter","section":"Bảng Test Case","subGroup":"Section S02 — Filter (Bộ lọc)","description":"Filter không có kết quả nào khớp → hiển thị empty state","preconditions":"1. User đăng nhập với role ADMIN<br>2. Không có Area nào có code=\"ZZZZ999\"","steps":"1. Navigate đến `/area`<br>2. Nhập \"ZZZZ999\" vào filter ID<br>3. Thực thi filter","data":"\"ZZZZ999\"","expected":"1. Bảng hiển thị empty state (không có dòng nào)<br>2. Response: `content: [], totalElements: 0`<br>3. Không có lỗi JS","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"Medium"},{"tcId":"TC-AREA-S03-001","tvpId":"TVP-016","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort cột エリアID tăng dần (code ASC)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ít nhất 3 Area với code khác nhau","steps":"1. Navigate đến `/area`<br>2. Click header cột「エリアID」để sort ASC<br>3. Quan sát thứ tự","data":"—","expected":"1. Danh sách sắp xếp theo `code` tăng dần<br>2. Tie-breaker: `id ASC`","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S03-002","tvpId":"TVP-016","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort cột エリアID giảm dần (code DESC)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ít nhất 3 Area với code khác nhau","steps":"1. Navigate đến `/area`<br>2. Click header cột「エリアID」để sort DESC<br>3. Quan sát thứ tự","data":"—","expected":"1. Danh sách sắp xếp theo `code` giảm dần<br>2. Tie-breaker: `id ASC`","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S03-003","tvpId":"TVP-017","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort cột エリア名 tăng dần (name ASC)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ít nhất 3 Area với name khác nhau","steps":"1. Navigate đến `/area`<br>2. Click header cột「エリア名」để sort ASC<br>3. Quan sát thứ tự","data":"—","expected":"1. Danh sách sắp xếp theo `name` tăng dần<br>2. Tie-breaker: `id ASC`","type":"","priority":"","actualSpec":"[⚠️ Mock≠Spec G-027 confirmed]: bug API thiếu `name` trong sort whitelist — cần fix trước khi test","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S03-004","tvpId":"TVP-017","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort cột エリア名 giảm dần (name DESC)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ít nhất 3 Area với name khác nhau","steps":"1. Navigate đến `/area`<br>2. Click header cột「エリア名」để sort DESC","data":"—","expected":"1. Danh sách sắp xếp theo `name` giảm dần<br>2. Tie-breaker: `id ASC`","type":"","priority":"","actualSpec":"[⚠️ Mock≠Spec G-027 confirmed]: cần fix bug sort whitelist trước","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S03-005","tvpId":"TVP-018","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort cột クライアント名 tăng dần (clientName ASC)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area thuộc nhiều client khác nhau","steps":"1. Navigate đến `/area`<br>2. Click header cột「クライアント名」để sort ASC","data":"—","expected":"1. Danh sách sắp xếp theo `m_clients.name` tăng dần<br>2. Tie-breaker: `id ASC`","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S03-006","tvpId":"TVP-018","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort cột クライアント名 giảm dần (clientName DESC)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area thuộc nhiều client khác nhau","steps":"1. Navigate đến `/area`<br>2. Click header cột「クライアント名」để sort DESC","data":"—","expected":"1. Danh sách sắp xếp theo `m_clients.name` giảm dần<br>2. Tie-breaker: `id ASC`","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S03-007","tvpId":"TVP-019","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort cột センター名 tăng dần — area không có center xếp cuối (NULLS LAST)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area A có DC, Area B không có DC","steps":"1. Navigate đến `/area`<br>2. Click header cột センター名 (nếu có) để sort ASC","data":"—","expected":"1. Area có DC sắp xếp theo MIN(dc.name) ASC<br>2. Area B (không có DC) xếp cuối cùng","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S03-008","tvpId":"TVP-019","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort cột センター名 giảm dần — area không có center xếp cuối (NULLS LAST)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area A có DC, Area B không có DC","steps":"1. Navigate đến `/area`<br>2. Click header cột センター名 (nếu có) để sort DESC","data":"—","expected":"1. Area có DC sắp xếp theo MIN(dc.name) DESC<br>2. Area B (không có DC) xếp cuối cùng (NULLS LAST)","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S03-009","tvpId":"TVP-020","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort field không hợp lệ → 400 PSMS-AREA-001","preconditions":"1. User đăng nhập với role ADMIN<br>2. API có thể gọi trực tiếp","steps":"1. Gọi `GET /v1/areas?sort=description,asc`<br>2. Quan sát response","data":"sort=description,asc","expected":"1. HTTP 400 Bad Request<br>2. Error code: `PSMS-AREA-001`<br>3. Message:「並び替えの項目が不正です。」","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"Medium"},{"tcId":"TC-AREA-S03-010","tvpId":"TVP-021","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Sort direction không hợp lệ → 400 PSMS-AREA-002","preconditions":"1. User đăng nhập với role ADMIN<br>2. API có thể gọi trực tiếp","steps":"1. Gọi `GET /v1/areas?sort=code,UP`<br>2. Quan sát response","data":"sort=code,UP","expected":"1. HTTP 400 Bad Request<br>2. Error code: `PSMS-AREA-002`<br>3. Message:「並び替えの方向が不正です。」","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"Medium"},{"tcId":"TC-AREA-S03-011","tvpId":"TVP-022","subSection":"Sort","section":"Bảng Test Case","subGroup":"Section S03 — Sort (Sắp xếp)","description":"Đổi thứ tự sort → filter condition vẫn giữ nguyên","preconditions":"1. User đăng nhập với role ADMIN<br>2. Đang apply filter clientId=X trên màn hình M-02","steps":"1. Navigate đến `/area`, chọn filter client X<br>2. Click header cột「エリアID」để đổi sort<br>3. Quan sát kết quả","data":"—","expected":"1. Danh sách re-sort theo cột mới<br>2. Filter client X vẫn active<br>3. Chỉ Area của client X hiển thị","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S04-001","tvpId":"TVP-023","subSection":"Pagination","section":"Bảng Test Case","subGroup":"Section S04 — Pagination (Phân trang)","description":"Default page size = 30 bản ghi/trang","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ≥31 Area chưa xóa mềm","steps":"1. Navigate đến `/area` (không filter)<br>2. Quan sát số dòng trong bảng và response API","data":"—","expected":"1. Bảng hiển thị đúng 30 dòng (hoặc ít hơn nếu tổng < 30)<br>2. API response: `size: 30`<br>3. Trang 1 có tối đa 30 bản ghi","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S04-002","tvpId":"TVP-024","subSection":"Pagination","section":"Bảng Test Case","subGroup":"Section S04 — Pagination (Phân trang)","description":"Pagination controls ẩn khi ở trang 1","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ≤30 Area chưa xóa mềm (chỉ 1 trang)","steps":"1. Navigate đến `/area`<br>2. Quan sát khu vực phân trang","data":"—","expected":"1. Pagination controls không hiển thị (hoặc disabled)<br>2. Tất cả Area hiển thị trong 1 trang","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S04-003","tvpId":"TVP-024","subSection":"Pagination","section":"Bảng Test Case","subGroup":"Section S04 — Pagination (Phân trang)","description":"Pagination controls hiển thị từ trang 2 trở đi","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ≥31 Area chưa xóa mềm","steps":"1. Navigate đến `/area`<br>2. Chuyển sang trang 2<br>3. Quan sát pagination controls","data":"—","expected":"1. Pagination controls hiển thị<br>2. Có thể điều hướng trang","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S04-004","tvpId":"TVP-025","subSection":"Pagination","section":"Bảng Test Case","subGroup":"Section S04 — Pagination (Phân trang)","description":"Chuyển trang: filter và sort được giữ nguyên","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có ≥31 Area thuộc client X<br>3. Đang apply filter client X và sort code DESC","steps":"1. Navigate đến `/area`, filter client X, sort DESC<br>2. Chuyển sang trang 2<br>3. Quan sát kết quả","data":"—","expected":"1. Trang 2 hiển thị đúng Area tiếp theo của client X<br>2. Sort vẫn code DESC<br>3. Filter client X vẫn active","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S04-005","tvpId":"TVP-026","subSection":"Pagination","section":"Bảng Test Case","subGroup":"Section S04 — Pagination (Phân trang)","description":"Trang cuối hiển thị đúng số bản ghi còn lại (< 30)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có 35 Area chưa xóa mềm","steps":"1. Navigate đến `/area`<br>2. Chuyển đến trang cuối (trang 2)<br>3. Quan sát số dòng","data":"—","expected":"1. Trang 2 hiển thị đúng 5 bản ghi (35 - 30)<br>2. Không có dòng trống thừa","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"Medium"},{"tcId":"TC-AREA-S04-006","tvpId":"TVP-027","subSection":"Pagination","section":"Bảng Test Case","subGroup":"Section S04 — Pagination (Phân trang)","description":"totalElements và totalPages trong response trả về đúng","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có chính xác N Area chưa xóa mềm","steps":"1. Gọi `GET /v1/areas` (không filter)<br>2. Quan sát response","data":"—","expected":"1. `totalElements = N` (đúng số Area active trong DB)<br>2. `totalPages = ceil(N/30)`<br>3. `size = 30`","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"Medium"},{"tcId":"TC-AREA-S05-001","tvpId":"TVP-028","subSection":"Drawer","section":"Bảng Test Case","subGroup":"Section S05 — Drawer (Mở / Đóng)","description":"Nhấn nút「追加」→ Drawer mở ở chế độ tạo mới","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load tại `/area`","steps":"1. Navigate đến `/area`<br>2. Click nút「追加」(toolbar)<br>3. Quan sát Drawer","data":"—","expected":"1. Drawer mở từ phải<br>2. Form rỗng (không có dữ liệu pre-fill)<br>3. Tiêu đề Drawer:「エリア新規登録」","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S05-002","tvpId":"TVP-029","subSection":"Drawer","section":"Bảng Test Case","subGroup":"Section S05 — Drawer (Mở / Đóng)","description":"Nhấn nút「編集」→ Drawer mở ở chế độ sửa, dữ liệu đúng","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area X với code=\"A01\", name=\"関西\", client=\"ABC Corp\"<br>3. Area X chưa xóa mềm","steps":"1. Navigate đến `/area`<br>2. Tìm dòng Area X<br>3. Click nút「編集」trên dòng đó<br>4. Quan sát Drawer","data":"—","expected":"1. Drawer mở ở chế độ sửa<br>2. Field エリアID hiển thị \"A01\" (read-only)<br>3. Field エリア名 hiển thị \"関西\"<br>4. Field クライアント名 selected \"ABC Corp\"","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S05-003","tvpId":"TVP-030","subSection":"Drawer","section":"Bảng Test Case","subGroup":"Section S05 — Drawer (Mở / Đóng)","description":"Deep link tạo mới → Drawer mở ở chế độ tạo mới","preconditions":"1. User đăng nhập với role ADMIN","steps":"1. Navigate đến `/area?drawer=area&mode=new`<br>2. Quan sát Drawer","data":"URL: `/area?drawer=area&mode=new`","expected":"1. Drawer mở ở chế độ tạo mới<br>2. Form rỗng<br>3. Tiêu đề:「エリア新規登録」","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S05-004","tvpId":"TVP-031","subSection":"Drawer","section":"Bảng Test Case","subGroup":"Section S05 — Drawer (Mở / Đóng)","description":"Deep link sửa với ID hợp lệ → Drawer load đúng dữ liệu","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area id=5 chưa xóa mềm","steps":"1. Navigate đến `/area?drawer=area&mode=edit&id=5`<br>2. Quan sát Drawer","data":"URL: `/area?drawer=area&mode=edit&id=5`","expected":"1. Drawer mở ở chế độ sửa<br>2. Dữ liệu Area id=5 được load đúng vào form","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S05-005","tvpId":"TVP-032","subSection":"Drawer","section":"Bảng Test Case","subGroup":"Section S05 — Drawer (Mở / Đóng)","description":"Deep link sửa với ID không tồn tại hoặc đã xóa mềm → 404","preconditions":"1. User đăng nhập với role ADMIN<br>2. ID 99999 không tồn tại hoặc đã xóa mềm","steps":"1. Navigate đến `/area?drawer=area&mode=edit&id=99999`<br>2. Quan sát hành vi","data":"URL: `/area?drawer=area&mode=edit&id=99999`","expected":"1. API trả 404 PSMS-AREA-001<br>2. Drawer không mở hoặc hiển thị lỗi<br>3. List M-02 vẫn hiển thị bình thường","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"Medium"},{"tcId":"TC-AREA-S05-006","tvpId":"TVP-033","subSection":"Drawer","section":"Bảng Test Case","subGroup":"Section S05 — Drawer (Mở / Đóng)","description":"Sau khi Drawer đóng (Lưu thành công), danh sách M-02 reload","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer đang mở ở chế độ tạo mới","steps":"1. Nhập dữ liệu hợp lệ vào form tạo mới<br>2. Click「保存」<br>3. Quan sát danh sách sau khi Drawer đóng","data":"code=\"NEWTEST\", name=\"テスト\", client=ACTIVE client","expected":"1. Drawer đóng sau khi lưu thành công<br>2. Danh sách M-02 reload<br>3. Area mới \"NEWTEST\" xuất hiện trong danh sách","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S05-007","tvpId":"TVP-034","subSection":"Drawer","section":"Bảng Test Case","subGroup":"Section S05 — Drawer (Mở / Đóng)","description":"Filter và sort state sau khi Drawer đóng","preconditions":"1. User đăng nhập với role ADMIN<br>2. Đang apply filter client X và sort code DESC<br>3. Drawer mở và Lưu thành công","steps":"1. Apply filter và sort<br>2. Click「編集」, sửa dữ liệu<br>3. Click「保存」<br>4. Quan sát filter/sort sau khi Drawer đóng","data":"—","expected":"[⚠️ Need Confirm G-013]: Filter và sort có giữ nguyên hay reset về mặc định?","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S06-001","tvpId":"TVP-035","subSection":"Create UI","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"Tiêu đề Drawer ở chế độ tạo mới là「エリア新規登録」","preconditions":"1. User đăng nhập với role ADMIN<br>2. Màn hình M-02 đã load","steps":"1. Click「追加」<br>2. Quan sát tiêu đề Drawer","data":"—","expected":"1. Tiêu đề hiển thị đúng「エリア新規登録」<br>2. Không có text khác như \"Create\"","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Low"},{"tcId":"TC-AREA-S06-002","tvpId":"TVP-036","subSection":"Create UI","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"Dropdown クライアント名 chỉ hiển thị client ACTIVE chưa xóa mềm","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Client A (ACTIVE), Client B (INACTIVE), Client C (deleted_at IS NOT NULL)","steps":"1. Click「追加」để mở Drawer<br>2. Mở dropdown クライアント名<br>3. Quan sát danh sách","data":"—","expected":"1. Client A (ACTIVE) xuất hiện trong dropdown<br>2. Client B (INACTIVE) KHÔNG xuất hiện<br>3. Client C (soft-deleted) KHÔNG xuất hiện","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S06-003","tvpId":"TVP-036","subSection":"Create UI","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"Dropdown クライアント名 không hiển thị client đã xóa mềm","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Client X đã xóa mềm (deleted_at IS NOT NULL)","steps":"1. Click「追加」để mở Drawer<br>2. Mở dropdown クライアント名<br>3. Tìm Client X","data":"—","expected":"1. Client X không xuất hiện trong dropdown<br>2. Dropdown chỉ chứa client ACTIVE chưa xóa","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S06-004","tvpId":"TVP-037","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID bắt buộc nhập — để trống → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Để trống field エリアID<br>2. Nhập「テスト」vào エリア名<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"code=\"\" (rỗng)","expected":"1. Inline error hiển thị dưới field エリアID:「エリアIDを入力してください」<br>2. Form không submit<br>3. Drawer không đóng","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-005","tvpId":"TVP-038","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID vượt quá 20 ký tự → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập 21 ký tự vào field エリアID<br>2. Nhập tên hợp lệ<br>3. Chọn client<br>4. Click「保存」","data":"code=\"ABCDEFGHIJKLMNOPQRSTU\" (21 ký tự)","expected":"1. Inline error:「20文字以内で入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-006","tvpId":"TVP-039","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID BVA: nhập đúng 20 ký tự → hợp lệ","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở<br>3. Code 20 ký tự chưa tồn tại trong DB","steps":"1. Nhập đúng 20 ký tự vào エリアID<br>2. Nhập tên hợp lệ<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"code=\"ABCDEFGHIJ1234567890\" (20 ký tự)","expected":"1. Không có error về độ dài<br>2. API gọi thành công (201)","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-007","tvpId":"TVP-039","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID BVA: nhập 21 ký tự → lỗi","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập 21 ký tự vào エリアID<br>2. Click「保存」","data":"code=\"ABCDEFGHIJ12345678901\" (21 ký tự)","expected":"1. Inline error:「20文字以内で入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"High"},{"tcId":"TC-AREA-S06-008","tvpId":"TVP-040","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID: ký tự không hợp lệ → error pattern","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập \"エリア@#\" vào field エリアID<br>2. Click「保存」","data":"code=\"エリア@#\"","expected":"1. Inline error:「半角英数字とハイフンのみで入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-009","tvpId":"TVP-040","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID: ký tự hợp lệ (chữ, số) được chấp nhận","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở<br>3. Code chưa tồn tại trong DB","steps":"1. Nhập \"ABC123\" vào field エリアID<br>2. Nhập tên hợp lệ<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"code=\"ABC123\"","expected":"1. Không có error pattern<br>2. Form submit thành công (201)","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-010","tvpId":"TVP-040","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID: ký tự gạch nối (-)","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập \"kansai-01\" vào field エリアID<br>2. Nhập tên hợp lệ<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"code=\"kansai-01\"","expected":"[⚠️ Need Confirm G-022]: Spec ghi 半角英数字 (không đề cập hyphen); detail-design pattern cho phép hyphen → cần confirm. Nếu hyphen hợp lệ: 201 Created. Nếu không: error pattern","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-011","tvpId":"TVP-041","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 bắt buộc nhập — để trống → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập code hợp lệ vào エリアID<br>2. Để trống field エリア名<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"name=\"\" (rỗng)","expected":"1. Inline error dưới field エリア名:「エリア名称を入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-012","tvpId":"TVP-042","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 chỉ toàn khoảng trắng → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập code hợp lệ<br>2. Nhập \"   \" (chỉ khoảng trắng) vào エリア名<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"name=\"   \"","expected":"1. Inline error:「エリア名称を入力してください」<br>2. Form không submit (`@NotBlank` coi toàn khoảng trắng là rỗng)","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-013","tvpId":"TVP-043","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 vượt quá 100 ký tự → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập 101 ký tự vào field エリア名<br>2. Click「保存」","data":"name=\"あ\" × 101 ký tự","expected":"1. Inline error:「100文字以内で入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"[⚠️ G-021 confirmed]: max=100 cho cả Create lẫn Update","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-014","tvpId":"TVP-044","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 BVA: nhập đúng 100 ký tự → hợp lệ","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở<br>3. Name 100 ký tự chưa tồn tại trong DB","steps":"1. Nhập đúng 100 ký tự vào エリア名<br>2. Nhập code hợp lệ<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"name=\"あ\" × 100 ký tự","expected":"1. Không có error độ dài<br>2. Form submit thành công (201)","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-015","tvpId":"TVP-044","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 BVA: nhập 101 ký tự → lỗi","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập 101 ký tự vào エリア名<br>2. Click「保存」","data":"name=\"あ\" × 101 ký tự","expected":"1. Inline error:「100文字以内で入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"High"},{"tcId":"TC-AREA-S06-016","tvpId":"TVP-045","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 có khoảng trắng đầu/cuối → trim trước khi lưu","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở<br>3. Tên \"関西\" chưa tồn tại trong DB","steps":"1. Nhập \"  関西  \" vào エリア名<br>2. Nhập code hợp lệ<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"name=\"  関西  \"","expected":"1. Form submit thành công (201)<br>2. Response: `name = \"関西\"` (đã trim)<br>3. DB `m_areas.name = \"関西\"` (không có khoảng trắng)","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"Medium"},{"tcId":"TC-AREA-S06-017","tvpId":"TVP-046","subSection":"Create Validation","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"クライアント名 bắt buộc chọn — không chọn → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập code hợp lệ vào エリアID<br>2. Nhập tên hợp lệ vào エリア名<br>3. Không chọn client<br>4. Click「保存」","data":"clientId=null","expected":"1. Inline error dưới dropdown:「クライアントを入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S06-018","tvpId":"TVP-047","subSection":"Create Business","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID unique case-sensitive: \"A1\" và \"a1\" trong cùng client là 2 code khác nhau","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB đã có Area code=\"A1\" thuộc client X","steps":"1. Click「追加」<br>2. Nhập \"a1\" vào エリアID<br>3. Nhập tên mới chưa tồn tại<br>4. Chọn client X<br>5. Click「保存」","data":"code=\"a1\", cùng client X đã có code=\"A1\"","expected":"1. Tạo thành công (201)<br>2. Area mới code=\"a1\" xuất hiện trong danh sách<br>3. Không bị báo lỗi trùng","type":"","priority":"","actualSpec":"[⚠️ G-024 confirmed]: code case-sensitive. Implementation hiện có bug IgnoreCase — cần fix trước khi test","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S06-019","tvpId":"TVP-048","subSection":"Create Business","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID trùng (cùng client, cùng case) → 409","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB đã có Area code=\"01\" thuộc client X","steps":"1. Click「追加」<br>2. Nhập \"01\" vào エリアID<br>3. Nhập tên mới chưa tồn tại<br>4. Chọn client X<br>5. Click「保存」","data":"code=\"01\", cùng client X đã có code=\"01\"","expected":"1. HTTP 409 Conflict<br>2. Error:「指定されたエリアIDとクライアントの組み合わせは既に登録されています。」<br>3. Drawer không đóng","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"High"},{"tcId":"TC-AREA-S06-020","tvpId":"TVP-049","subSection":"Create Business","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリアID trùng nhưng khác client → 201 OK","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB đã có Area code=\"01\" thuộc client X<br>3. Client Y tồn tại và ACTIVE","steps":"1. Click「追加」<br>2. Nhập \"01\" vào エリアID<br>3. Nhập tên mới<br>4. Chọn client Y (khác client X)<br>5. Click「保存」","data":"code=\"01\", client Y (khác client X)","expected":"1. Tạo thành công (201)<br>2. Area mới với code=\"01\" client Y xuất hiện trong danh sách<br>3. Unique scope chỉ trong phạm vi cùng client","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"High"},{"tcId":"TC-AREA-S06-021","tvpId":"TVP-050","subSection":"Create Business","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 trùng (cùng client) → 409","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB đã có Area name=\"関西\" thuộc client X","steps":"1. Click「追加」<br>2. Nhập code mới chưa tồn tại<br>3. Nhập \"関西\" vào エリア名<br>4. Chọn client X<br>5. Click「保存」","data":"name=\"関西\", cùng client X đã có name=\"関西\"","expected":"[⚠️ Need Confirm G-025]: Unique (client_id, name) có trong DB constraint nhưng không có trong spec. Nếu confirmed: 409 PSMS-AREA-002「このエリア名称は既に登録されています」","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"High"},{"tcId":"TC-AREA-S06-022","tvpId":"TVP-051","subSection":"Create Business","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 trùng sau trim → 409","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB đã có Area name=\"関西\" thuộc client X","steps":"1. Click「追加」<br>2. Nhập code mới<br>3. Nhập \"  関西  \" (có khoảng trắng) vào エリア名<br>4. Chọn client X<br>5. Click「保存」","data":"name=\"  関西  \" khi DB có \"関西\" (cùng client)","expected":"[⚠️ Need Confirm G-025]: Nếu unique name confirmed: 409 (trim match → coi là trùng)","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"Medium"},{"tcId":"TC-AREA-S06-023","tvpId":"TVP-052","subSection":"Create Business","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"エリア名 trùng nhưng khác client → 201 OK","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB đã có Area name=\"関西\" thuộc client X<br>3. Client Y ACTIVE","steps":"1. Click「追加」<br>2. Nhập code mới<br>3. Nhập \"関西\" vào エリア名<br>4. Chọn client Y<br>5. Click「保存」","data":"name=\"関西\", client Y (khác client X)","expected":"1. Tạo thành công (201)<br>2. Unique name scope theo từng client — khác client không bị chặn","type":"","priority":"","actualSpec":"[⚠️ Phụ thuộc G-025 được confirm]","statusSpec":"Edge Case","note":"Medium"},{"tcId":"TC-AREA-S06-024","tvpId":"TVP-053","subSection":"Create Business","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"clientId là client INACTIVE → 400 PSMS-AREA-003","preconditions":"1. User đăng nhập với role ADMIN<br>2. Biết ID của Client INACTIVE","steps":"1. Gọi API trực tiếp: `POST /v1/areas` với clientId=ID_INACTIVE_CLIENT<br>2. Quan sát response","data":"clientId = ID của client INACTIVE","expected":"1. HTTP 400 Bad Request<br>2. Error code: `PSMS-AREA-003`<br>3. Message:「クライアントが見つかりません、または無効です」","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"High"},{"tcId":"TC-AREA-S06-025","tvpId":"TVP-054","subSection":"Create Business","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"clientId là client đã xóa mềm → 400 PSMS-AREA-003","preconditions":"1. User đăng nhập với role ADMIN<br>2. Biết ID của Client đã xóa mềm","steps":"1. Gọi API: `POST /v1/areas` với clientId=ID_DELETED_CLIENT<br>2. Quan sát response","data":"clientId = ID của client đã xóa mềm","expected":"1. HTTP 400 Bad Request<br>2. Error code: `PSMS-AREA-003`<br>3. Message:「クライアントが見つかりません、または無効です」","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"High"},{"tcId":"TC-AREA-S06-026","tvpId":"TVP-055","subSection":"Create Save","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"「保存」thành công → 201, Drawer đóng, area mới xuất hiện với status=ACTIVE","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở<br>3. Code và name chưa tồn tại trong DB","steps":"1. Nhập code=\"NEWAREA01\"<br>2. Nhập name=\"新エリア\"<br>3. Chọn client ACTIVE<br>4. Click「保存」","data":"code=\"NEWAREA01\", name=\"新エリア\"","expected":"1. HTTP 201 Created<br>2. Drawer đóng<br>3. Danh sách M-02 reload<br>4. Area \"NEWAREA01\" xuất hiện trong danh sách<br>5. ステータス hiển thị「有効」(ACTIVE)","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S06-027","tvpId":"TVP-056","subSection":"Create Save","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"Toast hiển thị「登録しました」sau khi tạo mới thành công","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở","steps":"1. Nhập dữ liệu hợp lệ<br>2. Click「保存」<br>3. Quan sát toast notification","data":"code hợp lệ, name hợp lệ, client ACTIVE","expected":"1. Toast xanh/success hiển thị ngay sau khi tạo<br>2. Nội dung toast:「登録しました」","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S06-028","tvpId":"TVP-057","subSection":"Create Save","section":"Bảng Test Case","subGroup":"Section S06 — Create (Tạo mới)","description":"DB state sau khi tạo mới: verify tất cả field","preconditions":"1. User đăng nhập với role ADMIN<br>2. Tạo Area thành công với dữ liệu biết trước","steps":"1. Tạo Area: code=\"DBTEST01\", name=\"  DB テスト  \", client_id=X<br>2. Lấy id từ response<br>3. Query DB: `SELECT * FROM m_areas WHERE id = {id}`","data":"code=\"DBTEST01\", name=\"  DB テスト  \" (có khoảng trắng)","expected":"1. `code = \"DBTEST01\"`<br>2. `name = \"DB テスト\"` (đã trim)<br>3. `client_id = X`<br>4. `status = 'ACTIVE'`<br>5. `deleted_at IS NULL`<br>6. `created_by = updated_by = email của user đang đăng nhập`","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"High"},{"tcId":"TC-AREA-S07-001","tvpId":"TVP-058","subSection":"Edit UI","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Tiêu đề Drawer ở chế độ sửa là「エリア編集（ID=X）」","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area với code=\"A01\" chưa xóa mềm","steps":"1. Click「編集」trên dòng Area code=\"A01\"<br>2. Quan sát tiêu đề Drawer","data":"Area code=\"A01\"","expected":"1. Tiêu đề Drawer:「エリア編集（ID=A01）」<br>2. X = area_code của Area đang sửa","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Low"},{"tcId":"TC-AREA-S07-002","tvpId":"TVP-059","subSection":"Edit UI","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Field エリアID là read-only ở chế độ sửa","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ sửa đang mở","steps":"1. Quan sát field エリアID trong Drawer sửa<br>2. Thử click vào field<br>3. Thử nhập ký tự","data":"—","expected":"1. Field エリアID hiển thị dưới dạng read-only (disabled/không edit được)<br>2. Không thể thay đổi giá trị code","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S07-003","tvpId":"TVP-060","subSection":"Edit UI","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Field エリア名 được pre-fill đúng giá trị từ DB","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area id=5, name=\"関西\"","steps":"1. Click「編集」trên dòng Area id=5<br>2. Quan sát field エリア名","data":"—","expected":"1. Field エリア名 hiển thị \"関西\" (giá trị từ DB)<br>2. User có thể chỉnh sửa","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S07-004","tvpId":"TVP-060","subSection":"Edit UI","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Field クライアント名 được pre-fill đúng giá trị từ DB","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area id=5 thuộc client \"ABC Corp\"","steps":"1. Click「編集」trên dòng Area id=5<br>2. Quan sát dropdown クライアント名","data":"—","expected":"1. Dropdown selected giá trị \"ABC Corp\"<br>2. Selected value đúng với client_id trong DB","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S07-005","tvpId":"TVP-061","subSection":"Edit UI","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Nút「削除」màu đỏ chỉ hiển thị ở chế độ Sửa","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ sửa đang mở","steps":"1. Quan sát Drawer ở chế độ sửa<br>2. Quan sát có nút「削除」(màu đỏ) không","data":"—","expected":"1. Nút「削除」màu đỏ hiển thị trong Drawer sửa","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S07-006","tvpId":"TVP-061","subSection":"Edit UI","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Nút「削除」KHÔNG hiển thị ở chế độ Tạo mới","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ tạo mới đang mở","steps":"1. Click「追加」để mở Drawer tạo mới<br>2. Quan sát có nút「削除」không","data":"—","expected":"1. Nút「削除」KHÔNG có trong Drawer tạo mới<br>2. Chỉ có「保存」và「キャンセル」","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S07-007","tvpId":"TVP-062","subSection":"Edit Validation","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"エリア名 bắt buộc nhập ở chế độ sửa — để trống → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ sửa đang mở","steps":"1. Xóa hết nội dung field エリア名<br>2. Click「保存」","data":"name=\"\"","expected":"1. Inline error:「エリア名称を入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S07-008","tvpId":"TVP-062","subSection":"Edit Validation","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"エリア名 chỉ toàn khoảng trắng ở chế độ sửa → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ sửa đang mở","steps":"1. Xóa hết nội dung エリア名, nhập \"   \"<br>2. Click「保存」","data":"name=\"   \"","expected":"1. Inline error:「エリア名称を入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S07-009","tvpId":"TVP-062","subSection":"Edit Validation","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"エリア名 vượt 100 ký tự ở chế độ sửa → error","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ sửa đang mở","steps":"1. Nhập 101 ký tự vào field エリア名<br>2. Click「保存」","data":"name=\"あ\" × 101 ký tự","expected":"1. Inline error:「100文字以内で入力してください」<br>2. Form không submit","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S07-010","tvpId":"TVP-062","subSection":"Edit Validation","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"エリア名 đúng 100 ký tự ở chế độ sửa → hợp lệ","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ sửa đang mở<br>3. Name 100 ký tự chưa tồn tại trong DB (ngoài area đang sửa)","steps":"1. Nhập đúng 100 ký tự vào エリア名<br>2. Click「保存」","data":"name=\"あ\" × 100 ký tự","expected":"1. Không có error độ dài<br>2. Form submit thành công (200)","type":"","priority":"","actualSpec":"","statusSpec":"Validation","note":"High"},{"tcId":"TC-AREA-S07-011","tvpId":"TVP-063","subSection":"Edit Business","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"PUT gửi kèm field `code` trong body → BE bỏ qua, DB giữ nguyên code gốc","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area id=5, code=\"ORIGINAL\"","steps":"1. Gọi API: `PUT /v1/areas/5` với body `{ \"code\": \"NEW-CODE\", \"name\": \"近畿\", \"clientId\": X }`<br>2. Query DB sau đó","data":"body có `code=\"NEW-CODE\"`","expected":"1. HTTP 200 OK<br>2. Response `code = \"ORIGINAL\"` (không đổi)<br>3. DB `m_areas.code = \"ORIGINAL\"` (giữ nguyên)","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S07-012","tvpId":"TVP-064","subSection":"Edit Business","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Đổi エリア名 sang tên mới unique trong client → 200 OK","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer sửa Area id=5 (name=\"関西\") đang mở<br>3. Name \"近畿\" chưa tồn tại trong cùng client","steps":"1. Sửa エリア名 thành \"近畿\"<br>2. Click「保存」","data":"name=\"近畿\"","expected":"1. HTTP 200 OK<br>2. Response `name = \"近畿\"`<br>3. Drawer đóng<br>4. List hiển thị name mới \"近畿\"","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S07-013","tvpId":"TVP-065","subSection":"Edit Business","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Giữ nguyên エリア名 của chính area đang sửa → 200 OK (self-exclusion)","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer sửa Area id=5 (name=\"関西\") đang mở","steps":"1. Không thay đổi エリア名 (giữ \"関西\")<br>2. Click「保存」","data":"name=\"関西\" (giữ nguyên)","expected":"1. HTTP 200 OK<br>2. Unique check loại trừ chính Area đang sửa<br>3. Không báo lỗi trùng name","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"High"},{"tcId":"TC-AREA-S07-014","tvpId":"TVP-066","subSection":"Edit Business","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"エリア名 trùng với area khác trong cùng client → 409 PSMS-AREA-002","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area id=5 (client X) và Area id=7 (client X, name=\"関東\")<br>3. Drawer sửa Area id=5 đang mở","steps":"1. Sửa エリア名 của Area id=5 thành \"関東\"<br>2. Click「保存」","data":"name=\"関東\" (trùng với Area id=7 cùng client X)","expected":"1. HTTP 409 Conflict<br>2. Error code: `PSMS-AREA-002`<br>3. Message:「このエリア名称は既に登録されています」<br>4. Drawer không đóng","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"High"},{"tcId":"TC-AREA-S07-015","tvpId":"TVP-067","subSection":"Edit Business","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Đổi クライアント名 sang client khác (ACTIVE + not-deleted) → 200 OK","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer sửa Area id=5 (client X) đang mở<br>3. Client Y ACTIVE chưa xóa mềm","steps":"1. Thay đổi dropdown クライアント名 sang client Y<br>2. Click「保存」","data":"clientId = ID của client Y","expected":"1. HTTP 200 OK<br>2. Response `clientId = Y`, `clientName = name của client Y`<br>3. List hiển thị tên client mới","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S07-016","tvpId":"TVP-068","subSection":"Edit Business","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Đổi sang client INACTIVE → 400 PSMS-AREA-003","preconditions":"1. User đăng nhập với role ADMIN<br>2. Biết ID của Client INACTIVE","steps":"1. Gọi API: `PUT /v1/areas/{id}` với clientId=ID_INACTIVE_CLIENT","data":"clientId = ID client INACTIVE","expected":"1. HTTP 400 Bad Request<br>2. Error code: `PSMS-AREA-003`<br>3. Message:「クライアントが見つかりません、または無効です」","type":"","priority":"","actualSpec":"","statusSpec":"Negative","note":"High"},{"tcId":"TC-AREA-S07-017","tvpId":"TVP-069","subSection":"Edit Save","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"「保存」thành công → 200, Drawer đóng, list refresh","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer sửa Area id=5 đang mở","steps":"1. Sửa エリア名 thành \"近畿\"<br>2. Click「保存」<br>3. Quan sát list","data":"name=\"近畿\"","expected":"1. HTTP 200 OK<br>2. Drawer đóng<br>3. Danh sách reload<br>4. Area id=5 hiển thị name=\"近畿\"","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S07-018","tvpId":"TVP-070","subSection":"Edit Save","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Toast hiển thị「編集しました」sau khi sửa thành công","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer sửa đang mở","steps":"1. Sửa dữ liệu hợp lệ<br>2. Click「保存」<br>3. Quan sát toast","data":"—","expected":"1. Toast success hiển thị:「編集しました」","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"Medium"},{"tcId":"TC-AREA-S07-019","tvpId":"TVP-071","subSection":"Edit Save","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"DB state sau khi sửa: name và client_id cập nhật, code và status giữ nguyên","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5: code=\"A01\", name=\"関西\", client_id=X, status=\"ACTIVE\"","steps":"1. Sửa: name=\"近畿\", clientId=Y<br>2. Click「保存」<br>3. Query DB: `SELECT * FROM m_areas WHERE id=5`","data":"name=\"近畿\", clientId=Y","expected":"1. `name = \"近畿\"` (cập nhật)<br>2. `client_id = Y` (cập nhật)<br>3. `code = \"A01\"` (giữ nguyên)<br>4. `status = \"ACTIVE\"` (giữ nguyên)<br>5. `updated_at` = thời điểm sửa (mới nhất)<br>6. `updated_by` = email user đang đăng nhập","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"High"},{"tcId":"TC-AREA-S07-020","tvpId":"TVP-072","subSection":"Edit Business","section":"Bảng Test Case","subGroup":"Section S07 — Edit (Sửa)","description":"Area bị xóa mềm bởi user khác trong khi đang mở Drawer → PUT → 404","preconditions":"1. User A đang mở Drawer sửa Area id=5<br>2. User B xóa mềm Area id=5 trong khi User A vẫn mở Drawer","steps":"1. User A mở Drawer sửa Area id=5<br>2. User B gọi DELETE /v1/areas/5 (Area bị xóa mềm)<br>3. User A click「保存」trong Drawer","data":"—","expected":"1. API trả 404 PSMS-AREA-001「エリアが見つかりません」<br>2. [⚠️ Need Confirm G-006]: FE xử lý thế nào — đóng Drawer tự động? Hiển thị toast?","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"Medium"},{"tcId":"TC-AREA-S08-001","tvpId":"TVP-073","subSection":"Delete UI","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Nhấn「削除」→ dialog hiển thị tiêu đề「エリアの削除」","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ sửa đang mở","steps":"1. Click nút「削除」(màu đỏ) trong Drawer<br>2. Quan sát dialog","data":"—","expected":"1. Dialog xuất hiện<br>2. Tiêu đề:「エリアの削除」","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S08-002","tvpId":"TVP-073","subSection":"Delete UI","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Dialog xóa hiển thị nội dung đúng","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer chế độ sửa đang mở","steps":"1. Click「削除」<br>2. Quan sát nội dung dialog","data":"—","expected":"1. Nội dung:「本当にこのエリアを削除してもよろしいですか？」","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S08-003","tvpId":"TVP-073","subSection":"Delete UI","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Dialog xóa có đủ 2 nút「キャンセル」và「削除する」","preconditions":"1. User đăng nhập với role ADMIN<br>2. Dialog xóa đang hiển thị","steps":"1. Quan sát dialog","data":"—","expected":"1. Nút「キャンセル」hiển thị<br>2. Nút「削除する」hiển thị<br>3. Thứ tự và style đúng theo mockup","type":"","priority":"","actualSpec":"","statusSpec":"UI","note":"High"},{"tcId":"TC-AREA-S08-004","tvpId":"TVP-074","subSection":"Delete UI","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Nhấn「キャンセル」trong dialog → dialog đóng, Drawer vẫn mở","preconditions":"1. User đăng nhập với role ADMIN<br>2. Dialog xóa đang hiển thị","steps":"1. Click「キャンセル」trong dialog<br>2. Quan sát UI","data":"—","expected":"1. Dialog đóng<br>2. Drawer vẫn mở (không đóng)<br>3. Không có API xóa nào được gọi<br>4. Dữ liệu Area không thay đổi","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S08-005","tvpId":"TVP-075","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Xóa thành công (area không có DC/Store active) → 204","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5 không có DC/Store active (deleted_at IS NULL) tham chiếu","steps":"1. Click「編集」trên Area id=5<br>2. Click「削除」trong Drawer<br>3. Click「削除する」để xác nhận","data":"—","expected":"1. HTTP 204 No Content<br>2. Drawer đóng<br>3. Danh sách M-02 reload<br>4. Area id=5 không còn xuất hiện trong danh sách","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S08-006","tvpId":"TVP-076","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Xóa bị chặn khi còn Delivery Center active tham chiếu → 409 MSG-022","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5 có Delivery Center active (deleted_at IS NULL) tham chiếu","steps":"1. Click「編集」trên Area id=5<br>2. Click「削除」→ xác nhận","data":"—","expected":"1. HTTP 409 Conflict<br>2. Error code: `MSG-022`<br>3. Message:「関連データが存在するため削除できません。」<br>4. Area không bị xóa","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S08-007","tvpId":"TVP-077","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Xóa bị chặn khi còn Store active tham chiếu → 409 MSG-022","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5 có Store active (deleted_at IS NULL) tham chiếu<br>3. Không có DC active","steps":"1. Click「編集」trên Area id=5<br>2. Click「削除」→ xác nhận","data":"—","expected":"1. HTTP 409 Conflict<br>2. Error code: `MSG-022`<br>3. Message:「関連データが存在するため削除できません。」","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S08-008","tvpId":"TVP-078","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Xóa bị chặn khi có cả DC lẫn Store active → 409 MSG-022","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5 có cả DC active và Store active tham chiếu","steps":"1. Click「編集」trên Area id=5<br>2. Click「削除」→ xác nhận","data":"—","expected":"1. HTTP 409 Conflict<br>2. Error code: `MSG-022`<br>3. Message:「関連データが存在するため削除できません。」<br>4. Message không phân biệt loại tham chiếu","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"High"},{"tcId":"TC-AREA-S08-009","tvpId":"TVP-079","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Xóa không bị chặn khi DC/Store đã xóa mềm → 204","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5 có DC và Store nhưng tất cả đã xóa mềm (deleted_at IS NOT NULL)","steps":"1. Click「編集」trên Area id=5<br>2. Click「削除」→ xác nhận","data":"—","expected":"1. HTTP 204 No Content<br>2. Area bị xóa mềm thành công<br>3. DC/Store đã xóa mềm không chặn quá trình xóa","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"High"},{"tcId":"TC-AREA-S08-010","tvpId":"TVP-080","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Sau soft delete: GET /v1/areas/{id} → 404","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5 vừa bị xóa mềm thành công","steps":"1. Sau khi xóa mềm Area id=5<br>2. Gọi `GET /v1/areas/5`","data":"—","expected":"1. HTTP 404 Not Found<br>2. Error code: `PSMS-AREA-001`<br>3. Message:「エリアが見つかりません」","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"High"},{"tcId":"TC-AREA-S08-011","tvpId":"TVP-080","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Sau soft delete: Area không xuất hiện trong GET /v1/areas list","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area code=\"A01\" vừa bị xóa mềm","steps":"1. Gọi `GET /v1/areas` (không filter)<br>2. Tìm Area code=\"A01\" trong response","data":"—","expected":"1. Area code=\"A01\" không có trong `content[]`<br>2. `totalElements` không tính Area đã xóa mềm","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"High"},{"tcId":"TC-AREA-S08-012","tvpId":"TVP-080","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"Soft delete: row vẫn tồn tại trong DB với deleted_at IS NOT NULL","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5 vừa bị xóa mềm","steps":"1. Query DB trực tiếp: `SELECT * FROM m_areas WHERE id=5`","data":"—","expected":"1. Row vẫn tồn tại (không xóa vật lý)<br>2. `deleted_at IS NOT NULL`<br>3. Các field khác (`code`, `name`, etc.) giữ nguyên","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"High"},{"tcId":"TC-AREA-S08-013","tvpId":"TVP-081","subSection":"Delete","section":"Bảng Test Case","subGroup":"Section S08 — Delete (Xóa)","description":"DB state sau khi xóa mềm: deleted_at, deleted_by, updated_at, updated_by","preconditions":"1. User đăng nhập với role ADMIN<br>2. Area id=5 vừa bị xóa mềm","steps":"1. Xóa mềm Area id=5<br>2. Query DB: `SELECT deleted_at, deleted_by, updated_at, updated_by FROM m_areas WHERE id=5`","data":"—","expected":"1. `deleted_at = NOW()` (không phải NULL)<br>2. `deleted_by = email của ADMIN user`<br>3. `updated_at` được cập nhật (mới nhất)<br>4. `updated_by = email của ADMIN user`","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"High"},{"tcId":"TC-AREA-S09-001","tvpId":"TVP-082","subSection":"Cancel","section":"Bảng Test Case","subGroup":"Section S09 — Cancel (Hủy)","description":"Nhấn「キャンセル」→ Drawer đóng, không lưu dữ liệu đã nhập","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới đang mở, đã nhập một số dữ liệu","steps":"1. Nhập code=\"TEMP01\", name=\"テスト\", chọn client<br>2. Click「キャンセル」<br>3. Quan sát UI","data":"—","expected":"1. Drawer đóng ngay (không có confirmation dialog)<br>2. Dữ liệu đã nhập bị hủy<br>3. Không có API call nào được gọi<br>4. Danh sách M-02 không thay đổi","type":"","priority":"","actualSpec":"[⚠️ Need Confirm G-009]: Không có confirm dialog khi hủy là cố ý hay bỏ sót?","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S10-001","tvpId":"TVP-083","subSection":"Authorization","section":"Bảng Test Case","subGroup":"Section S10 — Authorization (Phân quyền)","description":"Không có JWT → 401 Unauthorized","preconditions":"—","steps":"1. Gọi `GET /v1/areas` không có header Authorization<br>2. Quan sát response","data":"(no token)","expected":"1. HTTP 401 Unauthorized<br>2. Response có message xác thực thất bại","type":"","priority":"","actualSpec":"","statusSpec":"Security","note":"High"},{"tcId":"TC-AREA-S10-002","tvpId":"TVP-084","subSection":"Authorization","section":"Bảng Test Case","subGroup":"Section S10 — Authorization (Phân quyền)","description":"Token hết hạn → 401 Unauthorized","preconditions":"Token đã hết hạn","steps":"1. Gọi `GET /v1/areas` với expired JWT<br>2. Quan sát response","data":"Expired JWT","expected":"1. HTTP 401 Unauthorized","type":"","priority":"","actualSpec":"","statusSpec":"Security","note":"High"},{"tcId":"TC-AREA-S10-003","tvpId":"TVP-085","subSection":"Authorization","section":"Bảng Test Case","subGroup":"Section S10 — Authorization (Phân quyền)","description":"Role LOGISTICS truy cập GET /v1/areas → 403 Forbidden","preconditions":"Có JWT hợp lệ với role LOGISTICS","steps":"1. Gọi `GET /v1/areas` với LOGISTICS token<br>2. Quan sát response","data":"LOGISTICS JWT","expected":"1. HTTP 403 Forbidden<br>2. Message:「権限がありません」","type":"","priority":"","actualSpec":"","statusSpec":"Security","note":"High"},{"tcId":"TC-AREA-S10-004","tvpId":"TVP-086","subSection":"Authorization","section":"Bảng Test Case","subGroup":"Section S10 — Authorization (Phân quyền)","description":"Role ADMIN có đầy đủ quyền CRUD → 2xx","preconditions":"Có JWT hợp lệ với role ADMIN","steps":"1. Gọi GET /v1/areas → 200<br>2. Gọi POST /v1/areas → 201<br>3. Gọi PUT /v1/areas/{id} → 200<br>4. Gọi DELETE /v1/areas/{id} → 204","data":"ADMIN JWT","expected":"1. Tất cả request trả 2xx<br>2. Không có lỗi phân quyền","type":"","priority":"","actualSpec":"","statusSpec":"Security","note":"High"},{"tcId":"TC-AREA-S10-005","tvpId":"TVP-087","subSection":"Authorization","section":"Bảng Test Case","subGroup":"Section S10 — Authorization (Phân quyền)","description":"URL `/area` không truy cập được khi chưa đăng nhập","preconditions":"Chưa đăng nhập (không có session/token)","steps":"1. Mở browser mới (không có session)<br>2. Navigate đến `/area`<br>3. Quan sát hành vi","data":"(chưa đăng nhập)","expected":"1. Bị redirect đến trang login<br>2. Không thể xem nội dung M-02","type":"","priority":"","actualSpec":"","statusSpec":"Security","note":"High"},{"tcId":"TC-AREA-S11-001","tvpId":"TVP-088","subSection":"DB↔UI","section":"Bảng Test Case","subGroup":"Section S11 — DB ↔ UI Data Mapping","description":"`m_areas.code` hiển thị đúng ở cột エリアID","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area code=\"XYZ-99\"","steps":"1. Query DB: `SELECT code FROM m_areas WHERE id=N`<br>2. Navigate đến `/area`<br>3. Tìm dòng Area id=N<br>4. Quan sát cột エリアID","data":"—","expected":"1. Cột エリアID hiển thị \"XYZ-99\" (đúng với DB)","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"Medium"},{"tcId":"TC-AREA-S11-002","tvpId":"TVP-089","subSection":"DB↔UI","section":"Bảng Test Case","subGroup":"Section S11 — DB ↔ UI Data Mapping","description":"`m_areas.name` hiển thị đúng ở cột エリア名","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area name=\"関西テスト\"","steps":"1. Query DB: `SELECT name FROM m_areas WHERE id=N`<br>2. Quan sát cột エリア名 trên UI","data":"—","expected":"1. Cột エリア名 hiển thị \"関西テスト\" (đúng với DB)","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"Medium"},{"tcId":"TC-AREA-S11-003","tvpId":"TVP-090","subSection":"DB↔UI","section":"Bảng Test Case","subGroup":"Section S11 — DB ↔ UI Data Mapping","description":"`m_clients.name` hiển thị đúng ở cột クライアント名 (JOIN)","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area client_id=X, m_clients.name=\"ファミリーマート\"","steps":"1. Query DB: `SELECT c.name FROM m_areas a JOIN m_clients c ON a.client_id=c.id WHERE a.id=N`<br>2. Quan sát cột クライアント名","data":"—","expected":"1. Cột クライアント名 hiển thị \"ファミリーマート\" (đúng với join từ DB)","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"Medium"},{"tcId":"TC-AREA-S11-004","tvpId":"TVP-091","subSection":"DB↔UI","section":"Bảng Test Case","subGroup":"Section S11 — DB ↔ UI Data Mapping","description":"`m_areas.status = 'ACTIVE'` → UI hiển thị「有効」","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area status=\"ACTIVE\"","steps":"1. Quan sát cột ステータス của Area ACTIVE","data":"status = \"ACTIVE\"","expected":"1. UI hiển thị「有効」<br>2. Không hiển thị text \"ACTIVE\"","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"Medium"},{"tcId":"TC-AREA-S11-005","tvpId":"TVP-091","subSection":"DB↔UI","section":"Bảng Test Case","subGroup":"Section S11 — DB ↔ UI Data Mapping","description":"`m_areas.status = 'INACTIVE'` → UI hiển thị「無効」","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area status=\"INACTIVE\"","steps":"1. Quan sát cột ステータス của Area INACTIVE","data":"status = \"INACTIVE\"","expected":"1. UI hiển thị「無効」<br>2. Không hiển thị text \"INACTIVE\"","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"Medium"},{"tcId":"TC-AREA-S11-006","tvpId":"TVP-092","subSection":"DB↔UI","section":"Bảng Test Case","subGroup":"Section S11 — DB ↔ UI Data Mapping","description":"Round-trip: Tạo mới → reload danh sách → tất cả field hiển thị đúng","preconditions":"1. User đăng nhập với role ADMIN","steps":"1. Tạo Area mới: code=\"RT001\", name=\"ラウンドトリップ\", client=client A<br>2. Sau khi tạo thành công, reload list<br>3. Kiểm tra tất cả cột của Area mới","data":"code=\"RT001\", name=\"ラウンドトリップ\"","expected":"1. Cột エリアID: \"RT001\"<br>2. Cột エリア名: \"ラウンドトリップ\"<br>3. Cột クライアント名: tên của client A<br>4. Cột ステータス:「有効」<br>5. Không có field nào bị sót hoặc format sai","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"High"},{"tcId":"TC-AREA-S11-007","tvpId":"TVP-093","subSection":"DB↔UI","section":"Bảng Test Case","subGroup":"Section S11 — DB ↔ UI Data Mapping","description":"Mở Drawer sửa: giá trị load vào form đúng với DB","preconditions":"1. User đăng nhập với role ADMIN<br>2. DB có Area id=5: code=\"A01\", name=\"関西\", client_id=X","steps":"1. Query DB trước: ghi nhận code, name, client_id của Area id=5<br>2. Click「編集」trên dòng Area id=5<br>3. So sánh giá trị trong form với DB","data":"—","expected":"1. Field エリアID hiển thị \"A01\" (= `m_areas.code`)<br>2. Field エリア名 hiển thị \"関西\" (= `m_areas.name`)<br>3. Dropdown クライアント名 selected đúng client (= `m_clients.name` tương ứng `client_id=X`)","type":"","priority":"","actualSpec":"","statusSpec":"Data","note":"High"},{"tcId":"TC-AREA-S12-001","tvpId":"TVP-094","subSection":"Concurrency","section":"Bảng Test Case","subGroup":"Section S12 — Concurrency & System Behavior","description":"2 user tạo area cùng (client_id, code) đồng thời → 1×201, 1×409","preconditions":"2 user ADMIN đã đăng nhập","steps":"1. User A và User B đồng thời gọi `POST /v1/areas` với cùng `{code: \"CONCURRENT01\", clientId: X, name: \"テストA\"}` và `\"テストB\"`<br>2. Quan sát cả 2 response","data":"code=\"CONCURRENT01\", cùng clientId=X","expected":"1. Đúng 1 request → 201 Created<br>2. Đúng 1 request → 409 Conflict (DB unique constraint bảo vệ)<br>3. Chỉ có 1 record được insert vào DB","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"High"},{"tcId":"TC-AREA-S12-002","tvpId":"TVP-095","subSection":"Concurrency","section":"Bảng Test Case","subGroup":"Section S12 — Concurrency & System Behavior","description":"2 user sửa cùng area đồng thời → last-write-wins","preconditions":"2 user ADMIN đang mở Drawer sửa cùng Area","steps":"1. User A sửa name=\"近畿A\"<br>2. User B sửa name=\"近畿B\"<br>3. User A click「保存」trước, User B click sau","data":"—","expected":"[⚠️ Need Confirm G-026]: Optimistic lock chưa implement. Hiện tại last-write-wins — cả 2 PUT đều 200, DB giữ giá trị của request sau cùng","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"Medium"},{"tcId":"TC-AREA-S12-003","tvpId":"TVP-096","subSection":"User Behavior","section":"Bảng Test Case","subGroup":"Section S12 — Concurrency & System Behavior","description":"Double-click「保存」→ không tạo/cập nhật duplicate","preconditions":"1. User đăng nhập với role ADMIN<br>2. Drawer tạo mới với dữ liệu hợp lệ","steps":"1. Nhập dữ liệu hợp lệ vào form<br>2. Double-click nhanh nút「保存」<br>3. Kiểm tra số record được tạo trong DB","data":"—","expected":"1. Chỉ 1 record được tạo trong DB<br>2. Không có duplicate với cùng (client_id, code)","type":"","priority":"","actualSpec":"","statusSpec":"Edge Case","note":"Medium"},{"tcId":"TC-AREA-S12-004","tvpId":"TVP-097","subSection":"System Behavior","section":"Bảng Test Case","subGroup":"Section S12 — Concurrency & System Behavior","description":"API `/v1/areas` trả lỗi 500 → UI hiển thị thông báo lỗi, không crash","preconditions":"1. User đăng nhập với role ADMIN<br>2. Có thể mock API response về 500","steps":"1. Mock API `GET /v1/areas` trả 500<br>2. Navigate đến `/area`<br>3. Quan sát UI","data":"500 Internal Server Error","expected":"1. UI hiển thị thông báo lỗi phù hợp (toast đỏ hoặc error state)<br>2. UI không crash (không có JS error uncaught)<br>3. User có thể thử lại","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"},{"tcId":"TC-AREA-S12-005","tvpId":"TVP-098","subSection":"System Behavior","section":"Bảng Test Case","subGroup":"Section S12 — Concurrency & System Behavior","description":"API load dropdown クライアント名 thất bại → FE xử lý đúng","preconditions":"1. User đăng nhập với role ADMIN<br>2. Có thể mock API dropdown fail","steps":"1. Mock API load clients trả lỗi (500 / timeout)<br>2. Click「追加」để mở Drawer<br>3. Quan sát dropdown クライアント名","data":"—","expected":"[⚠️ Need Confirm G-011]: FE xử lý thế nào? Dropdown empty, disabled, hay error message? User vẫn submit được không?","type":"","priority":"","actualSpec":"","statusSpec":"Functional","note":"Medium"}];
+const STORAGE_KEY = META.storageKey || ('tc_state__' + (META.sourceFile || 'default'));
+
+const STATUS_OPTIONS = [
+  { value: 'open',   label: 'Open'    },
+  { value: 'pass',   label: 'Pass'    },
+  { value: 'fail',   label: 'Fail'    },
+  { value: 'impact', label: 'Impact'  },
+  { value: 'notrun', label: 'Not Run' },
+];
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+function saveState(state) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+let STATE = loadState();
+function getEntry(tcId) {
+  if (!STATE[tcId]) STATE[tcId] = { status: 'open', actual: '', userNote: '' };
+  return STATE[tcId];
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function escHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderInlineMd(text) {
+  if (!text) return '';
+  let html = String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  html = html.replace(/&lt;br\s*\/?&gt;/gi, '\n');
+  html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  return html;
+}
+
+function renderMultiline(text) {
+  if (!text || !String(text).trim()) return '<span class="muted">—</span>';
+  const parts = String(text).split(/<br\s*\/?>/i).map(l => l.trim()).filter(Boolean);
+  if (parts.length === 0) return '<span class="muted">—</span>';
+  if (parts.length === 1) return renderInlineMd(parts[0]);
+  return '<div class="multi-line">' + parts.map(l => '<div>' + renderInlineMd(l) + '</div>').join('') + '</div>';
+}
+
+const main = document.getElementById('main');
+
+const COLUMNS = [
+  { key: 'tcid',     label: 'TC ID',         cls: 'col-tcid' },
+  { key: 'tvp',      label: 'TVP',           cls: 'col-tvp' },
+  { key: 'subsec',   label: 'Sub-sec',       cls: 'col-subsec' },
+  { key: 'desc',     label: 'Description',   cls: 'col-desc' },
+  { key: 'pre',      label: 'Preconditions', cls: 'col-pre' },
+  { key: 'steps',    label: 'Test Steps',    cls: 'col-steps' },
+  { key: 'data',     label: 'Test Data',     cls: 'col-data' },
+  { key: 'expected', label: 'Expected',      cls: 'col-expected' },
+  { key: 'specnote', label: 'Note',          cls: 'col-specnote' },
+  { key: 'status',   label: 'Status',        cls: 'col-status' },
+  { key: 'actual',   label: 'Actual',        cls: 'col-actual' },
+  { key: 'pri',      label: 'Priority',      cls: 'col-pri' },
+  { key: 'type',     label: 'Type',          cls: 'col-type' },
+];
+
+function buildFilterOptions() {
+  const sectionSet = new Map();
+  const prioSet = new Set();
+  const typeSet = new Set();
+  for (const tc of TEST_DATA) {
+    if (tc.section) sectionSet.set(tc.section, true);
+    if (tc.priority) prioSet.add(tc.priority);
+    if (tc.type) typeSet.add(tc.type);
+  }
+  const secEl = document.getElementById('filter-section');
+  for (const s of sectionSet.keys()) {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s.length > 50 ? s.slice(0, 50) + '…' : s;
+    secEl.appendChild(o);
+  }
+  const prioEl = document.getElementById('filter-priority');
+  const prioOrder = ['Critical', 'High', 'Medium', 'Low'];
+  const prios = [...prioSet].sort((a,b) => {
+    const ia = prioOrder.indexOf(a), ib = prioOrder.indexOf(b);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  });
+  for (const p of prios) {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p;
+    prioEl.appendChild(o);
+  }
+  const typeEl = document.getElementById('filter-type');
+  for (const t of [...typeSet].sort()) {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    typeEl.appendChild(o);
+  }
+}
+
+function buildLayout() {
+  const grouped = new Map();
+  for (const tc of TEST_DATA) {
+    const sec = tc.section || '(no section)';
+    if (!grouped.has(sec)) grouped.set(sec, new Map());
+    const sub = tc.subGroup || '';
+    const subMap = grouped.get(sec);
+    if (!subMap.has(sub)) subMap.set(sub, []);
+    subMap.get(sub).push(tc);
+  }
+
+  const frag = document.createDocumentFragment();
+  for (const [sec, subMap] of grouped) {
+    const secCount = [...subMap.values()].reduce((a, arr) => a + arr.length, 0);
+    const block = document.createElement('div');
+    block.className = 'section-block';
+    block.dataset.section = sec;
+
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.innerHTML = '<span><span class="toggle-icon">▾</span>' + escHtml(sec) + '</span><span class="sec-count">' + secCount + ' TC</span>';
+    if (getCollapsedSections().has(sec)) block.classList.add('collapsed');
+    header.addEventListener('click', () => {
+      const isCollapsed = block.classList.toggle('collapsed');
+      const set = getCollapsedSections();
+      if (isCollapsed) set.add(sec); else set.delete(sec);
+      saveCollapsedSections(set);
+    });
+    block.appendChild(header);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    const table = document.createElement('table');
+    table.className = 'tc-table';
+
+    // colgroup for fixed widths
+    const colgroup = document.createElement('colgroup');
+    for (const c of COLUMNS) {
+      const col = document.createElement('col');
+      col.className = c.cls;
+      colgroup.appendChild(col);
+    }
+    table.appendChild(colgroup);
+
+    const thead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+    for (const c of COLUMNS) {
+      const th = document.createElement('th');
+      th.className = c.cls;
+      th.textContent = c.label;
+      headRow.appendChild(th);
+    }
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    for (const [sub, tcs] of subMap) {
+      const tbody = document.createElement('tbody');
+      tbody.className = 'subgroup-block';
+      tbody.dataset.subgroup = sub || '__none__';
+      if (sub) {
+        const subRow = document.createElement('tr');
+        subRow.className = 'subgroup-row';
+        const td = document.createElement('td');
+        td.colSpan = COLUMNS.length;
+        td.innerHTML = '<span class="sg-toggle-icon">▾</span>' + escHtml(sub);
+        const sgKey = sec + '::' + sub;
+        tbody.dataset.section = sec;
+        if (getCollapsedSubgroups().has(sgKey)) tbody.classList.add('collapsed');
+        subRow.addEventListener('click', () => {
+          const isCollapsed = tbody.classList.toggle('collapsed');
+          const set = getCollapsedSubgroups();
+          if (isCollapsed) set.add(sgKey); else set.delete(sgKey);
+          saveCollapsedSubgroups(set);
+        });
+        subRow.appendChild(td);
+        tbody.appendChild(subRow);
+      }
+      for (const tc of tcs) tbody.appendChild(buildRow(tc));
+      table.appendChild(tbody);
+    }
+
+    wrap.appendChild(table);
+    block.appendChild(wrap);
+    frag.appendChild(block);
+  }
+
+  const empty = document.createElement('div');
+  empty.className = 'empty-state hidden';
+  empty.id = 'empty-state';
+  empty.textContent = 'Không có test case nào khớp với bộ lọc hiện tại.';
+  frag.appendChild(empty);
+
+  main.appendChild(frag);
+}
+
+function buildRow(tc) {
+  const entry = getEntry(tc.tcId);
+  const tr = document.createElement('tr');
+  tr.className = 'tc-row s-' + entry.status;
+  tr.dataset.tcId = tc.tcId;
+  tr.dataset.section = tc.section;
+  tr.dataset.priority = tc.priority || '';
+  tr.dataset.type = tc.type || '';
+
+  // Hoisted ref so the status-change handler can flag the Actual cell.
+  let actualTa = null;
+  function refreshActualValidation() {
+    if (!actualTa) return false;
+    const needsActual = entry.status === 'fail' && (!entry.actual || !String(entry.actual).trim());
+    actualTa.classList.toggle('required-empty', needsActual);
+    tr.classList.toggle('needs-actual', needsActual);
+    return needsActual;
+  }
+
+  // TC ID
+  const c1 = document.createElement('td'); c1.className = 'col-tcid';
+  c1.innerHTML = '<span class="badge badge-tc">' + escHtml(tc.tcId) + '</span>';
+  tr.appendChild(c1);
+
+  // TVP
+  const c2 = document.createElement('td'); c2.className = 'col-tvp';
+  c2.innerHTML = tc.tvpId ? '<span class="badge badge-tvp">' + escHtml(tc.tvpId) + '</span>' : '<span class="muted">—</span>';
+  tr.appendChild(c2);
+
+  // Sub-section
+  const c3 = document.createElement('td'); c3.className = 'col-subsec';
+  c3.textContent = tc.subSection || '';
+  tr.appendChild(c3);
+
+  // Description
+  const c6 = document.createElement('td'); c6.className = 'col-desc';
+  c6.innerHTML = renderMultiline(tc.description);
+  tr.appendChild(c6);
+
+  // Preconditions
+  const c7 = document.createElement('td'); c7.className = 'col-pre';
+  c7.innerHTML = renderMultiline(tc.preconditions);
+  tr.appendChild(c7);
+
+  // Steps
+  const c8 = document.createElement('td'); c8.className = 'col-steps';
+  c8.innerHTML = renderMultiline(tc.steps);
+  tr.appendChild(c8);
+
+  // Test Data
+  const c9 = document.createElement('td'); c9.className = 'col-data';
+  c9.innerHTML = renderMultiline(tc.data);
+  tr.appendChild(c9);
+
+  // Expected
+  const c10 = document.createElement('td'); c10.className = 'col-expected';
+  c10.innerHTML = renderMultiline(tc.expected);
+  tr.appendChild(c10);
+
+  // Note: single editable textarea seeded with spec note (+ legacy userNote, if any)
+  const c11 = document.createElement('td'); c11.className = 'col-specnote';
+  if (entry.note === undefined) {
+    let seed = '';
+    if (tc.note) seed = String(tc.note).replace(/<br\s*\/?>/gi, '\n').trim();
+    if (entry.userNote && String(entry.userNote).trim()) {
+      seed = (seed ? seed + '\n\n' : '') + String(entry.userNote).trim();
+    }
+    entry.note = seed;
+  }
+  const noteTa = document.createElement('textarea');
+  noteTa.className = 'note-edit';
+  noteTa.placeholder = 'Ghi chú...';
+  noteTa.value = entry.note;
+  noteTa.addEventListener('input', () => {
+    entry.note = noteTa.value;
+    saveState(STATE);
+  });
+  c11.appendChild(noteTa);
+  tr.appendChild(c11);
+
+  // Status
+  const c12 = document.createElement('td'); c12.className = 'col-status';
+  const sel = document.createElement('select');
+  sel.className = 'status-select s-' + entry.status;
+  for (const o of STATUS_OPTIONS) {
+    const opt = document.createElement('option');
+    opt.value = o.value; opt.textContent = o.label;
+    if (o.value === entry.status) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  sel.addEventListener('change', () => {
+    const ns = sel.value;
+    entry.status = ns;
+    sel.className = 'status-select s-' + ns;
+    tr.className = 'tc-row s-' + ns;
+    saveState(STATE);
+    updateStats();
+    const needs = refreshActualValidation();
+    if (ns === 'fail' && needs) {
+      showToast('⚠️ Vui lòng nhập Actual khi Fail');
+    }
+  });
+  c12.appendChild(sel);
+  tr.appendChild(c12);
+
+  // Actual
+  const c13 = document.createElement('td'); c13.className = 'col-actual';
+  actualTa = document.createElement('textarea');
+  actualTa.placeholder = 'Kết quả thực tế...';
+  actualTa.value = entry.actual || '';
+  actualTa.addEventListener('input', () => {
+    entry.actual = actualTa.value;
+    saveState(STATE);
+    refreshActualValidation();
+  });
+  c13.appendChild(actualTa);
+  tr.appendChild(c13);
+  // Initial validation pass (e.g. row already loaded as Fail with empty Actual from a previous session)
+  refreshActualValidation();
+
+  // Priority (moved to end)
+  const cPri = document.createElement('td'); cPri.className = 'col-pri';
+  cPri.innerHTML = tc.priority ? '<span class="badge badge-pri-' + escHtml(tc.priority) + '">' + escHtml(tc.priority) + '</span>' : '<span class="muted">—</span>';
+  tr.appendChild(cPri);
+
+  // Type (moved to end)
+  const cType = document.createElement('td'); cType.className = 'col-type';
+  cType.innerHTML = tc.type ? '<span class="badge badge-type">' + escHtml(tc.type) + '</span>' : '<span class="muted">—</span>';
+  tr.appendChild(cType);
+
+  return tr;
+}
+
+function updateStats() {
+  const total = TEST_DATA.length;
+  let pass=0, fail=0, impact=0, notrun=0, open=0;
+  for (const tc of TEST_DATA) {
+    const s = (STATE[tc.tcId] && STATE[tc.tcId].status) || 'open';
+    if (s === 'pass') pass++;
+    else if (s === 'fail') fail++;
+    else if (s === 'impact') impact++;
+    else if (s === 'notrun') notrun++;
+    else open++;
+  }
+  const pct = (n) => total === 0 ? 0 : Math.round(n*100/total);
+  document.getElementById('st-total').textContent = total;
+  document.getElementById('st-pass').textContent = pass;
+  document.getElementById('st-fail').textContent = fail;
+  document.getElementById('st-impact').textContent = impact;
+  document.getElementById('st-notrun').textContent = notrun;
+  document.getElementById('st-open').textContent = open;
+  document.getElementById('st-pass-pct').textContent = pct(pass) + '%';
+  document.getElementById('st-fail-pct').textContent = pct(fail) + '%';
+  document.getElementById('pf-pass').style.width = pct(pass) + '%';
+  document.getElementById('pf-fail').style.width = pct(fail) + '%';
+  document.getElementById('pf-impact').style.width = pct(impact) + '%';
+  document.getElementById('pf-notrun').style.width = pct(notrun) + '%';
+  const tested = pass + fail + impact + notrun;
+  document.getElementById('progress-text').textContent = pct(tested) + '% tested (' + tested + '/' + total + ')';
+}
+
+function applyFilter() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const fSec = document.getElementById('filter-section').value;
+  const fStat = document.getElementById('filter-status').value;
+  const fPri = document.getElementById('filter-priority').value;
+  const fType = document.getElementById('filter-type').value;
+
+  let visible = 0;
+  const rows = document.querySelectorAll('tr.tc-row');
+  for (const row of rows) {
+    const tcId = row.dataset.tcId;
+    const tc = TEST_DATA.find(x => x.tcId === tcId);
+    if (!tc) continue;
+    const status = (STATE[tcId] && STATE[tcId].status) || 'open';
+
+    let show = true;
+    if (fSec && tc.section !== fSec) show = false;
+    if (fStat && status !== fStat) show = false;
+    if (fPri && tc.priority !== fPri) show = false;
+    if (fType && tc.type !== fType) show = false;
+    if (show && q) {
+      const haystack = [
+        tc.tcId, tc.tvpId, tc.subSection, tc.section, tc.subGroup,
+        tc.description, tc.preconditions, tc.steps, tc.data, tc.expected,
+        tc.type, tc.priority, tc.note
+      ].join(' ').toLowerCase();
+      if (!haystack.includes(q)) show = false;
+    }
+    row.classList.toggle('hidden', !show);
+    if (show) visible++;
+  }
+
+  // hide subgroup blocks (tbody) when none of their tc-rows are visible
+  document.querySelectorAll('tbody.subgroup-block').forEach(tb => {
+    const stillVisible = tb.querySelectorAll('tr.tc-row:not(.hidden)').length;
+    tb.classList.toggle('hidden', stillVisible === 0);
+  });
+
+  // hide section blocks when no visible tbody
+  document.querySelectorAll('.section-block').forEach(blk => {
+    const stillVisible = blk.querySelectorAll('tr.tc-row:not(.hidden)').length;
+    blk.classList.toggle('hidden', stillVisible === 0);
+  });
+
+  document.getElementById('result-count').textContent = visible + ' / ' + TEST_DATA.length + ' shown';
+  document.getElementById('empty-state').classList.toggle('hidden', visible !== 0);
+}
+
+function findFailsMissingActual() {
+  return TEST_DATA.filter(tc => {
+    const e = STATE[tc.tcId];
+    return e && e.status === 'fail' && (!e.actual || !String(e.actual).trim());
+  });
+}
+
+function confirmExportDespiteMissingActual() {
+  const missing = findFailsMissingActual();
+  if (missing.length === 0) return true;
+  const sample = missing.slice(0, 8).map(tc => '  • ' + tc.tcId).join('\n');
+  const more = missing.length > 8 ? '\n  …và ' + (missing.length - 8) + ' TC khác' : '';
+  return confirm(
+    '⚠️ Có ' + missing.length + ' TC Fail nhưng chưa nhập Actual:\n' +
+    sample + more +
+    '\n\nVẫn tiếp tục export?'
+  );
+}
+
+function exportJson() {
+  if (!confirmExportDespiteMissingActual()) return;
+  const payload = {
+    meta: META,
+    exportedAt: new Date().toISOString(),
+    state: STATE,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  a.download = (META.sourceFile || 'tc_results').replace(/\.md$/i,'') + '_results_' + ts + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Exported JSON');
+}
+
+function exportCsv() {
+  if (!confirmExportDespiteMissingActual()) return;
+
+  const COLS = ['TC ID','TVP ID','Sub-section','Description','Preconditions','Test Steps','Test Data','Expected','Note','Status','Actual','Priority','Type'];
+  const N = COLS.length;
+
+  // Compute stats
+  const total = TEST_DATA.length;
+  let pass=0, fail=0, impact=0, notrun=0, open=0;
+  for (const tc of TEST_DATA) {
+    const s = (STATE[tc.tcId] && STATE[tc.tcId].status) || 'open';
+    if (s === 'pass') pass++;
+    else if (s === 'fail') fail++;
+    else if (s === 'impact') impact++;
+    else if (s === 'notrun') notrun++;
+    else open++;
+  }
+  const tested = pass + fail + impact + notrun;
+  const pct = (n) => total === 0 ? 0 : Math.round(n*100/total);
+
+  // HTML-escape while preserving <br> tags so Excel renders them as line breaks.
+  // Split on <br>, escape each segment, then rejoin with <br>.
+  const esc = (s) => String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const xlVal = (s) => String(s == null ? '' : s)
+    .split(/<br\s*\/?>/gi).map(esc).join('<br>');
+
+  // ── Inline styles ──────────────────────────────────────────────────────────
+  // Table cell border
+  const B  = 'border:1px solid #9DC3E6;padding:5px 7px;vertical-align:top;font-size:11pt;';
+  // Column header  — Dark Blue Lighter 50%  (#BDD7EE / #1F3864)
+  const H  = 'background:#BDD7EE;color:#1F3864;font-weight:bold;border:1px solid #9DC3E6;padding:6px 8px;font-size:11pt;white-space:nowrap;';
+  // Section row    — Orange Lighter 80%     (#FCE4D6 / #833C00)
+  const SC = 'background:#FCE4D6;color:#833C00;font-weight:bold;border:1px solid #F4B183;padding:7px 10px;font-size:12pt;';
+  // SubGroup row   — subtle blue tint
+  const SG = 'background:#EBF3FB;color:#2E74B5;font-weight:600;border:1px solid #BDD7EE;padding:5px 12px;font-size:10.5pt;';
+  // Summary cells (no border)
+  const SL = 'padding:3px 8px;font-weight:bold;color:#1F3864;font-size:11pt;border:none;';
+  const SV = 'padding:3px 8px;font-size:11pt;border:none;';
+  // Status cell colours
+  const SS = {
+    pass:   'background:#D4EDDA;color:#155724;font-weight:600;' + B,
+    fail:   'background:#F8D7DA;color:#721C24;font-weight:600;' + B,
+    impact: 'background:#FFF3CD;color:#856404;font-weight:600;' + B,
+    notrun: 'background:#E2E3E5;color:#383D41;font-weight:600;' + B,
+    open:   'background:#CCE5FF;color:#004085;font-weight:600;' + B,
+  };
+
+  const mkTd   = (v, st) => '<td style="' + st + '">' + xlVal(v) + '</td>';
+  const mkSpan = (v, n, st) => '<td colspan="' + n + '" style="' + st + '">' + xlVal(v) + '</td>';
+  const gap    = () => '<tr>' + mkSpan('', N, SV) + '</tr>';
+
+  let body = '';
+
+  // ── Summary section ────────────────────────────────────────────────────────
+  body += '<tr>' + mkSpan('📊 TEST RESULT SUMMARY', N,
+    'background:#1F3864;color:#fff;font-weight:bold;padding:7px 10px;font-size:13pt;border:none;') + '</tr>';
+  body += '<tr>' + mkSpan('Source',        2, SL) + mkSpan(META.sourceFile || '', N-2, SV) + '</tr>';
+  if (META.screenName) body += '<tr>' + mkSpan('Màn hình',     2, SL) + mkSpan(META.screenName, N-2, SV) + '</tr>';
+  if (META.tvpVersion) body += '<tr>' + mkSpan('Phiên bản TVP',2, SL) + mkSpan(META.tvpVersion, N-2, SV) + '</tr>';
+  body += '<tr>' + mkSpan('Exported at',   2, SL) + mkSpan(new Date().toLocaleString('vi-VN'), N-2, SV) + '</tr>';
+  body += gap();
+
+  // Status summary table
+  body += '<tr>'
+    + mkSpan('Status', 1, SL) + mkSpan('Count', 1, SL) + mkSpan('%', 1, SL)
+    + mkSpan('', N-3, SV) + '</tr>';
+  const sSummary = [
+    ['✅ Pass',    pass,   pct(pass)   + '%', 'background:#D4EDDA;color:#155724;padding:3px 8px;border:none;'],
+    ['❌ Fail',    fail,   pct(fail)   + '%', 'background:#F8D7DA;color:#721C24;padding:3px 8px;border:none;'],
+    ['⚠️ Impact',  impact, pct(impact) + '%', 'background:#FFF3CD;color:#856404;padding:3px 8px;border:none;'],
+    ['⬜ Not Run', notrun, pct(notrun) + '%', 'background:#E2E3E5;color:#383D41;padding:3px 8px;border:none;'],
+    ['🔵 Open',    open,   pct(open)   + '%', 'background:#CCE5FF;color:#004085;padding:3px 8px;border:none;'],
+    ['Total',      total,  '100%',            'font-weight:bold;padding:3px 8px;border:none;'],
+  ];
+  for (const [lbl, cnt, p, st] of sSummary) {
+    body += '<tr>'
+      + mkSpan(lbl, 1, st) + mkSpan(cnt, 1, st) + mkSpan(p, 1, st)
+      + mkSpan('', N-3, SV) + '</tr>';
+  }
+
+  // Failed TCs quick list
+  const failedList = TEST_DATA.filter(tc => ((STATE[tc.tcId] && STATE[tc.tcId].status) || 'open') === 'fail');
+  if (failedList.length) {
+    body += gap();
+    body += '<tr>' + mkSpan('❌ FAILED TEST CASES', N,
+      'background:#F8D7DA;color:#721C24;font-weight:bold;padding:6px 10px;font-size:11pt;border:none;') + '</tr>';
+    body += '<tr>' + mkSpan('TC ID',1,SL) + mkSpan('Description',3,SL) + mkSpan('Actual',N-4,SL) + '</tr>';
+    for (const tc of failedList) {
+      const e = STATE[tc.tcId] || {};
+      body += '<tr>' + mkSpan(tc.tcId,1,SV) + mkSpan(tc.description,3,SV) + mkSpan(e.actual||'',N-4,SV) + '</tr>';
+    }
+  }
+
+  body += gap();
+  body += gap();
+
+  // ── Test cases table ───────────────────────────────────────────────────────
+  // Column header row (Dark Blue Lighter 50%)
+  body += '<tr>' + COLS.map(c => mkTd(c, H)).join('') + '</tr>';
+
+  // Group by section → subgroup (mirrors HTML layout)
+  const grouped = new Map();
+  for (const tc of TEST_DATA) {
+    const sec = tc.section || '(no section)';
+    if (!grouped.has(sec)) grouped.set(sec, new Map());
+    const sub = tc.subGroup || '';
+    const subMap = grouped.get(sec);
+    if (!subMap.has(sub)) subMap.set(sub, []);
+    subMap.get(sub).push(tc);
+  }
+
+  for (const [sec, subMap] of grouped) {
+    const secCount = [...subMap.values()].reduce((a, arr) => a + arr.length, 0);
+    // Section header row (Orange Lighter 80%)
+    body += '<tr>' + mkSpan('▶  ' + sec + '  (' + secCount + ' TC)', N, SC) + '</tr>';
+
+    for (const [sub, tcs] of subMap) {
+      if (sub) body += '<tr>' + mkSpan('    ◆  ' + sub, N, SG) + '</tr>';
+
+      for (const tc of tcs) {
+        const e   = STATE[tc.tcId] || { status:'open', actual:'' };
+        const sst = SS[e.status] || SS.open;
+        const WP  = B + 'white-space:pre-wrap;';
+        body += '<tr>'
+          + mkTd(tc.tcId,          B)
+          + mkTd(tc.tvpId,         B)
+          + mkTd(tc.subSection,    B)
+          + mkTd(tc.description,   WP + 'min-width:180px;')
+          + mkTd(tc.preconditions, WP)
+          + mkTd(tc.steps,         WP + 'min-width:180px;')
+          + mkTd(tc.data,          B)
+          + mkTd(tc.expected,      WP + 'min-width:180px;')
+          + mkTd(noteValue(tc, e), B)
+          + mkTd(e.status,         sst)
+          + mkTd(e.actual || '',   WP)
+          + mkTd(tc.priority,      B)
+          + mkTd(tc.type,          B)
+          + '</tr>';
+      }
+    }
+  }
+
+  // Wrap in Excel-compatible HTML (no external dependency)
+  const xls = '<html xmlns:o="urn:schemas-microsoft-com:office:office"'
+    + ' xmlns:x="urn:schemas-microsoft-com:office:excel"'
+    + ' xmlns="http://www.w3.org/TR/REC-html40">'
+    + '<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'
+    + '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>'
+    + '<x:ExcelWorksheet><x:Name>Test Cases</x:Name>'
+    + '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>'
+    + '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->'
+    + '<style>body{font-family:Calibri,Arial,sans-serif;}table{border-collapse:collapse;}td{vertical-align:top;}</style>'
+    + '</head><body><table>' + body + '</table></body></html>';
+
+  const blob = new Blob(['\uFEFF' + xls], { type:'application/vnd.ms-excel;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  a.download = (META.sourceFile || 'tc_results').replace(/\.md$/i,'') + '_results_' + ts + '.xls';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Exported XLS');
+}
+
+function csvCell(s) {
+  if (s == null) return '""';
+  s = String(s).replace(/"/g, '""');
+  return '"' + s + '"';
+}
+
+function formatStatusMd(s) {
+  if (s === 'pass')   return '✅ Pass';
+  if (s === 'fail')   return '❌ Fail';
+  if (s === 'impact') return '⚠️ Impact';
+  if (s === 'notrun') return '⬜ Not Run';
+  return '🔵 Open';
+}
+
+function mdCell(s) {
+  // Preserve existing <br> tags inside spec text; only escape pipes and
+  // convert raw newlines (from user textareas) to <br>.
+  if (s == null) return '';
+  return String(s).replace(/\|/g, '\\|').replace(/\r?\n/g, '<br>');
+}
+
+// Note value to use in exports — prefer the user-edited entry.note,
+// fall back to the original spec note if entry hasn't been seeded yet.
+function noteValue(tc, entry) {
+  if (entry && entry.note !== undefined) return String(entry.note || '');
+  if (tc.note) return String(tc.note).replace(/<br\s*\/?>/gi, '\n');
+  return '';
+}
+
+function exportMarkdown() {
+  if (!confirmExportDespiteMissingActual()) return;
+  const total = TEST_DATA.length;
+  let pass=0, fail=0, impact=0, notrun=0, open=0;
+  for (const tc of TEST_DATA) {
+    const s = (STATE[tc.tcId] && STATE[tc.tcId].status) || 'open';
+    if (s === 'pass') pass++;
+    else if (s === 'fail') fail++;
+    else if (s === 'impact') impact++;
+    else if (s === 'notrun') notrun++;
+    else open++;
+  }
+  const tested = pass + fail + impact + notrun;
+  const pct = (n) => total === 0 ? 0 : Math.round(n*100/total);
+
+  const out = [];
+  out.push('# ' + (META.docTitle || 'Test Results') + ' — Test Result Report');
+  out.push('');
+  out.push('| Mục | Nội dung |');
+  out.push('|---|---|');
+  if (META.sourceFile) out.push('| **Source** | `' + META.sourceFile + '` |');
+  if (META.screenName) out.push('| **Màn hình** | ' + META.screenName + ' |');
+  if (META.tvpVersion) out.push('| **Phiên bản TVP** | ' + META.tvpVersion + ' |');
+  out.push('| **Exported at** | ' + new Date().toISOString() + ' |');
+  out.push('| **Tổng TC** | ' + total + ' |');
+  out.push('| **Đã test** | ' + tested + ' / ' + total + ' (' + pct(tested) + '%) |');
+  out.push('');
+  out.push('## 📊 Test Result Summary');
+  out.push('');
+  out.push('| Status | Count | % |');
+  out.push('|---|---:|---:|');
+  out.push('| ✅ Pass | ' + pass + ' | ' + pct(pass) + '% |');
+  out.push('| ❌ Fail | ' + fail + ' | ' + pct(fail) + '% |');
+  out.push('| ⚠️ Impact | ' + impact + ' | ' + pct(impact) + '% |');
+  out.push('| ⬜ Not Run | ' + notrun + ' | ' + pct(notrun) + '% |');
+  out.push('| 🔵 Open | ' + open + ' | ' + pct(open) + '% |');
+  out.push('| **Total** | **' + total + '** | **100%** |');
+  out.push('');
+
+  // Failed TCs quick list
+  const failed = TEST_DATA.filter(tc => ((STATE[tc.tcId] && STATE[tc.tcId].status) || 'open') === 'fail');
+  if (failed.length) {
+    out.push('## ❌ Failed Test Cases');
+    out.push('');
+    for (const tc of failed) {
+      const e = STATE[tc.tcId] || {};
+      out.push('- **' + tc.tcId + '** — ' + (tc.description || '').replace(/\r?\n/g, ' '));
+      if (e.actual) out.push('  - Actual: ' + e.actual.replace(/\r?\n/g, ' '));
+    }
+    out.push('');
+  }
+
+  // Group rows by section + subgroup, emit table identical to source structure
+  const grouped = new Map();
+  for (const tc of TEST_DATA) {
+    const sec = tc.section || '(no section)';
+    if (!grouped.has(sec)) grouped.set(sec, new Map());
+    const sub = tc.subGroup || '';
+    const subMap = grouped.get(sec);
+    if (!subMap.has(sub)) subMap.set(sub, []);
+    subMap.get(sub).push(tc);
+  }
+
+  for (const [sec, subMap] of grouped) {
+    out.push('---');
+    out.push('');
+    out.push('## ' + sec);
+    out.push('');
+    for (const [sub, tcs] of subMap) {
+      if (sub) {
+        out.push('### ' + sub);
+        out.push('');
+      }
+      out.push('| TC ID | TVP ID | Sub-section | Test Description | Preconditions | Test Steps | Test Data | Expected Result | Test Type | Priority | Actual | Status | Note |');
+      out.push('|-------|--------|-------------|-----------------|---------------|------------|-----------|-----------------|-----------|----------|--------|--------|------|');
+      for (const tc of tcs) {
+        const e = STATE[tc.tcId] || { status:'open', actual:'', userNote:'' };
+        const cells = [
+          tc.tcId,
+          tc.tvpId,
+          mdCell(tc.subSection),
+          mdCell(tc.description),
+          mdCell(tc.preconditions),
+          mdCell(tc.steps),
+          mdCell(tc.data),
+          mdCell(tc.expected),
+          tc.type,
+          tc.priority,
+          mdCell(e.actual || tc.actualSpec || ''),
+          formatStatusMd(e.status),
+          mdCell(noteValue(tc, e)),
+        ];
+        out.push('| ' + cells.join(' | ') + ' |');
+      }
+      out.push('');
+    }
+  }
+
+  const md = out.join('\n');
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  a.download = (META.sourceFile || 'tc_results').replace(/\.md$/i,'') + '_results_' + ts + '.md';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Exported Markdown');
+}
+function stripHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '');
+}
+
+// CSV-friendly text: preserve line breaks so Excel renders multi-line cells.
+function csvText(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '');
+}
+
+function importJson(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (data && data.state && typeof data.state === 'object') {
+        STATE = data.state;
+        saveState(STATE);
+        location.reload();
+      } else {
+        showToast('File JSON không hợp lệ');
+      }
+    } catch (e) {
+      showToast('Lỗi đọc JSON: ' + e.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Reset toàn bộ trạng thái test? Tất cả Pass/Fail/Note sẽ bị xóa.')) return;
+  STATE = {};
+  saveState(STATE);
+  location.reload();
+}
+
+document.getElementById('search').addEventListener('input', applyFilter);
+document.getElementById('filter-section').addEventListener('change', applyFilter);
+document.getElementById('filter-status').addEventListener('change', applyFilter);
+document.getElementById('filter-priority').addEventListener('change', applyFilter);
+document.getElementById('filter-type').addEventListener('change', applyFilter);
+
+document.getElementById('btn-export').addEventListener('click', exportJson);
+document.getElementById('btn-export-csv').addEventListener('click', exportCsv);
+document.getElementById('btn-export-md').addEventListener('click', exportMarkdown);
+document.getElementById('btn-reset').addEventListener('click', resetAll);
+document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change', e => {
+  if (e.target.files[0]) importJson(e.target.files[0]);
+});
+
+const COLLAPSED_KEY = STORAGE_KEY + '__collapsed';
+function getCollapsedSections() {
+  try {
+    const raw = localStorage.getItem(COLLAPSED_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch (e) { return new Set(); }
+}
+function saveCollapsedSections(set) {
+  try { localStorage.setItem(COLLAPSED_KEY, JSON.stringify([...set])); } catch (e) {}
+}
+
+const COLLAPSED_SUB_KEY = STORAGE_KEY + '__collapsed_sub';
+function getCollapsedSubgroups() {
+  try {
+    const raw = localStorage.getItem(COLLAPSED_SUB_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch (e) { return new Set(); }
+}
+function saveCollapsedSubgroups(set) {
+  try { localStorage.setItem(COLLAPSED_SUB_KEY, JSON.stringify([...set])); } catch (e) {}
+}
+
+document.getElementById('btn-collapse-all').addEventListener('click', () => {
+  const secs = new Set();
+  document.querySelectorAll('.section-block').forEach(blk => {
+    blk.classList.add('collapsed');
+    secs.add(blk.dataset.section);
+  });
+  saveCollapsedSections(secs);
+  const subs = new Set();
+  document.querySelectorAll('tbody.subgroup-block').forEach(tb => {
+    if (tb.dataset.subgroup !== '__none__') {
+      tb.classList.add('collapsed');
+      subs.add(tb.dataset.section + '::' + tb.dataset.subgroup);
+    }
+  });
+  saveCollapsedSubgroups(subs);
+});
+document.getElementById('btn-expand-all').addEventListener('click', () => {
+  document.querySelectorAll('.section-block').forEach(blk => blk.classList.remove('collapsed'));
+  saveCollapsedSections(new Set());
+  document.querySelectorAll('tbody.subgroup-block').forEach(tb => tb.classList.remove('collapsed'));
+  saveCollapsedSubgroups(new Set());
+});
+
+document.addEventListener('keydown', e => {
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+    e.preventDefault();
+    document.getElementById('search').focus();
+  }
+});
+
+buildFilterOptions();
+buildLayout();
+updateStats();
+applyFilter();
+</script>
+
+</body>
+</html>

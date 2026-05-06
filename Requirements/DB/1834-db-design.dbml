@@ -1,0 +1,701 @@
+// ============================================================
+// FM出荷管理システム — DB Design v3.1
+// Screens: L-01~L-06 | T-01 | P-01~P-05 | ADM-04 | ADM-10 | M-01~M-09
+// Charter: t_pallet (チャーター利用 pallet tracking)
+//
+// v3.0 — Merged best of v1 + v2, fixed all gaps
+// v3.2 — Added t_pallet for charter shipment flow (from Basic Design comparison)
+//
+// v3.1 — Review fixes:
+//   [FIX-1]  Circular FK note: m_client.fixed_center_id ↔ m_delivery_center.client_id
+//            → Requires DEFERRABLE INITIALLY DEFERRED in migration SQL
+//   [FIX-2]  Added t_shipment_package + t_shipment_item for ADM-04 box/serial tracking
+//   [FIX-3]  t_plan_store_material: added counted_quantity, count_status, counted_at, counted_by
+//            → Supports P-02 カウント operation + P-01 badge (全完了/カウント中/数量不一致)
+//   [FIX-4]  Removed operator_id from t_plan_store (wrong level — operator is per count job)
+//   [FIX-5]  t_plan.deployment_period split into deployment_start + deployment_end (date range filter T-01)
+//   [FIX-6]  Added t_plan.sato_sent_at for audit trail (trigger for IN_PROGRESS transition)
+//
+// Auth design: Simple Role-Based (not full RBAC)
+//   • m_role + m_user.role_id → 1 user có 1 role
+//   • Permissions enforced in code (@PreAuthorize) — sufficient for 2 fixed roles
+//   • Full RBAC (m_permission + m_role_permission) is over-engineering for ADMIN/LOGISTICS only
+//
+// Conventions:
+//   • Table prefix: m_ master | t_ transaction
+//   • PK: BIGSERIAL, strategy = IDENTITY
+//   • Timestamps: TIMESTAMPTZ (not TIMESTAMP)
+//   • Soft delete: deleted_at / deleted_by (nullable)
+//   • No PostgreSQL ENUM — VARCHAR code strings only
+//   • Junction table: Composite PK, no unnecessary bigserial
+//   • Index naming: idx_{table}_{columns}
+// ============================================================
+
+Project FM_ShipmentMgmt {
+  database_type: "PostgreSQL"
+  Note: "Aurora PostgreSQL — schema: psms | FM出荷管理システム (Project 1834)"
+}
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  AUTH / AUTHZ                                       ║
+// ║                                                     ║
+// ║  m_user >── m_role                                  ║
+// ║  m_user ──< t_otp_token                             ║
+// ╚══════════════════════════════════════════════════════╝
+
+Table psms.m_roles {
+  id          bigserial    [pk]
+  code        varchar(20)  [not null, unique, note: 'ADMIN | LOGISTICS']
+  name        varchar(100) [not null, note: '管理者 | 物流担当']
+  description varchar(500)
+  created_at  timestamptz  [not null, default: `now()`]
+  created_by  varchar(100) [not null]
+  updated_at  timestamptz  [not null, default: `now()`]
+  updated_by  varchar(100) [not null]
+
+  Note: '''
+    Seed data (2 roles cố định):
+      id=1, code="ADMIN",     name="管理者"
+      id=2, code="LOGISTICS", name="物流担当"
+    Thêm role mới: INSERT vào bảng này — không cần sửa code.
+    ⚠ Auth design: Simple Role-Based, không dùng permission table.
+      Permissions được enforce bằng @PreAuthorize trong code.
+  '''
+
+  indexes {
+    code [name: 'idx_m_role_code']
+  }
+}
+
+Table psms.m_users {
+  id                 bigserial    [pk]
+  email              varchar(254) [not null, unique, note: 'Email là Login ID — dùng để đăng nhập và nhận OTP/link reset']
+  password_hash      varchar(255) [not null, note: 'BCrypt hash (cost=12) — không lưu plaintext']
+  full_name          varchar(100) [not null]
+  role_id            bigint       [not null, ref: > psms.m_roles.id, note: 'FK → m_role.id — 1 user có 1 role']
+  two_factor_enabled boolean      [not null, default: false, note: 'Bật/tắt OTP email. ADMIN: bắt buộc true']
+  status             varchar(20)  [not null, default: 'ACTIVE', note: 'ACTIVE | INACTIVE | LOCKED']
+  failed_login_count integer      [not null, default: 0, note: 'Reset về 0 khi login thành công. Không reset theo thời gian']
+  locked_at          timestamptz  [note: 'Set khi failed_login_count >= 5. null = không bị khóa. Unlock sau locked_at + 30 phút']
+  last_login_at      timestamptz
+  created_at         timestamptz  [not null, default: `now()`]
+  created_by         varchar(100) [not null]
+  updated_at         timestamptz  [not null, default: `now()`]
+  updated_by         varchar(100) [not null]
+  deleted_at         timestamptz
+  deleted_by         varchar(100)
+
+  Note: '''
+    L-01: Đăng nhập bằng email + password (email = Login ID, không có cột riêng).
+    L-02: two_factor_enabled=true → gửi OTP qua email → verify qua t_otp_token (type=LOGIN_OTP).
+    L-03~L-06: Reset password → t_otp_token (type=PASSWORD_RESET), 24 giờ hiệu lực.
+    LOCKED: failed_login_count >= 5 → set locked_at, status=LOCKED → unlock sau 30 phút.
+    ADMIN: role_id=1, two_factor_enabled phải true.
+  '''
+
+  indexes {
+    email   [name: 'idx_m_user_email']
+    role_id [name: 'idx_m_user_role_id']
+    status  [name: 'idx_m_user_status']
+  }
+}
+
+Table psms.t_otp_tokens {
+  id         bigserial    [pk]
+  user_id    bigint       [not null, ref: > psms.m_users.id]
+  token_hash varchar(255) [not null, note: 'Hashed token — raw token gửi qua email']
+  type       varchar(30)  [not null, note: 'LOGIN_OTP | PASSWORD_RESET']
+  expires_at timestamptz  [not null, note: 'LOGIN_OTP: 24 giờ | PASSWORD_RESET: 24 giờ (confirmed)']
+  used_at    timestamptz  [note: 'null = chưa dùng. Set khi verify thành công — one-time use']
+  ip_address varchar(45)  [note: 'IPv4/IPv6 cho audit']
+  created_at timestamptz  [not null, default: `now()`]
+  created_by varchar(100) [not null]
+
+  Note: '''
+    Dùng chung cho 2 luồng phân biệt bằng type:
+      - LOGIN_OTP (L-02): verify 2FA khi đăng nhập
+      - PASSWORD_RESET (L-03~L-06): reset mật khẩu (valid 24 giờ, one-time)
+    Immutable: không có updated_at/updated_by.
+    Cần cleanup job định kỳ xóa record expired (expires_at < now()).
+  '''
+
+  indexes {
+    token_hash      [name: 'idx_t_otp_token_hash']
+    (user_id, type) [name: 'idx_t_otp_token_user_type']
+    expires_at      [name: 'idx_t_otp_token_expires_at']
+  }
+}
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  MASTER DATA                                        ║
+// ╚══════════════════════════════════════════════════════╝
+
+Table psms.m_clients {
+  id                     bigserial    [pk]
+  code                   varchar(50)  [not null, unique, note: 'Mã client (business key)']
+  name                   varchar(255) [not null, note: 'Tên client (ví dụ: ファミリーマート)']
+  status                 varchar(20)  [not null, default: 'ACTIVE', note: 'ACTIVE | INACTIVE — INACTIVE: ẩn khỏi dropdown']
+
+  // --- Cài đặt nghiệp vụ per-client (từ màn hình chỉnh sửa M-01) ---
+  use_store_master       boolean      [not null, default: false, note: 'Dùng store master để tính số lượng hay dùng số trong file import']
+  use_material_master    boolean      [not null, default: false, note: 'Dùng material master hay không']
+  use_pallet_label_print boolean      [not null, default: false, note: 'In nhãn pallet hay không']
+  delivery_method        varchar(20)  [not null, default: 'CARRIER', note: 'CHARTER (チャーター) | CARRIER (運送会社)']
+  delivery_company_id    bigint       [ref: > psms.m_delivery_companies.id, note: 'FK nullable — default company khi delivery_method=CARRIER']
+  destination_type       varchar(20)  [not null, default: 'EACH_CENTER', note: 'EACH_CENTER | EACH_STORE | FIXED_CENTER']
+  fixed_center_id        bigint       [note: '⚠ CIRCULAR FK → m_delivery_center.id (dùng khi destination_type=FIXED_CENTER). Constraint phải dùng DEFERRABLE INITIALLY DEFERRED trong migration SQL. Không khai báo ref ở đây để tránh vòng lặp dependency khi tạo schema.']
+
+  created_at             timestamptz  [not null, default: `now()`]
+  created_by             varchar(100) [not null]
+  updated_at             timestamptz  [not null, default: `now()`]
+  updated_by             varchar(100) [not null]
+  deleted_at             timestamptz
+  deleted_by             varchar(100)
+
+  Note: '''
+    M-01. Khách hàng đặt hàng vật liệu (ví dụ: FamilyMart).
+    INACTIVE: ẩn khỏi dropdown ở tất cả màn hình khác.
+    Cài đặt per-client: quyết định luồng đóng gói (charter/carrier), in nhãn, tính số lượng.
+    delivery_company_id: nullable, chỉ dùng khi delivery_method=CARRIER.
+    fixed_center_id: nullable, chỉ dùng khi destination_type=FIXED_CENTER.
+
+    ⚠ CIRCULAR FK: fixed_center_id → m_delivery_center.id
+      Tạo migration theo thứ tự:
+        1. CREATE TABLE m_client (không có FK fixed_center_id)
+        2. CREATE TABLE m_delivery_center (có FK client_id → m_client.id)
+        3. ALTER TABLE m_client ADD CONSTRAINT fk_m_client_fixed_center
+             FOREIGN KEY (fixed_center_id) REFERENCES m_delivery_center(id)
+             DEFERRABLE INITIALLY DEFERRED;
+  '''
+
+  indexes {
+    code                [name: 'idx_m_client_code']
+    status              [name: 'idx_m_client_status']
+    delivery_company_id [name: 'idx_m_client_delivery_company_id']
+    fixed_center_id     [name: 'idx_m_client_fixed_center_id']
+  }
+}
+
+Table psms.m_areas {
+  id          bigserial    [pk]
+  code        varchar(20)  [not null, note: 'Mã khu vực (ví dụ: "01")']
+  name        varchar(255) [not null, note: 'Tên khu vực (ví dụ: 関西)']
+  client_id   bigint       [not null, ref: > psms.m_clients.id, note: 'FK → m_client.id — khu vực thuộc client nào']
+  description varchar(1000)
+  status      varchar(20)  [not null, default: 'ACTIVE', note: 'ACTIVE | INACTIVE']
+  created_at  timestamptz  [not null, default: `now()`]
+  created_by  varchar(100) [not null]
+  updated_at  timestamptz  [not null, default: `now()`]
+  updated_by  varchar(100) [not null]
+  deleted_at  timestamptz
+  deleted_by  varchar(100)
+
+  Note: '''
+    M-02. Đơn vị địa lý thuộc 1 client.
+    client_id NOT NULL: mỗi area thuộc về 1 client cụ thể.
+    Filter màn hình M-02: lọc theo client → lọc area_code.
+    Unique constraint: (client_id, code) — cùng client không trùng mã area.
+    Unique constraint: (client_id, name) — cùng client không trùng tên area (basic-design M-02 §4.2).
+    Soft delete: deleted_at / deleted_by — cannot delete if referenced by m_delivery_center or m_store.
+  '''
+
+  indexes {
+    (client_id, code) [unique, name: 'uq_m_area_client_code']
+    (client_id, name) [unique, name: 'uq_m_area_client_name']
+    client_id         [name: 'idx_m_area_client_id']
+    status            [name: 'idx_m_area_status']
+  }
+}
+
+Table psms.m_delivery_centers {
+  id          bigserial    [pk]
+  code        varchar(50)  [not null, note: 'Mã trung tâm (ví dụ: "kakogawa")']
+  name        varchar(255) [not null, note: 'Tên trung tâm (ví dụ: 加古川配送センター)']
+  client_id   bigint       [not null, ref: > psms.m_clients.id, note: 'FK → m_client.id']
+  area_id     bigint       [not null, ref: > psms.m_areas.id, note: 'FK → m_area.id']
+  postal_code varchar(10)
+  prefecture  varchar(20)  [note: '都道府県 (ví dụ: 大阪府)']
+  address     varchar(500)
+  phone       varchar(20)
+  status      varchar(20)  [not null, default: 'ACTIVE', note: 'ACTIVE | INACTIVE']
+  created_at  timestamptz  [not null, default: `now()`]
+  created_by  varchar(100) [not null]
+  updated_at  timestamptz  [not null, default: `now()`]
+  updated_by  varchar(100) [not null]
+  deleted_at  timestamptz
+  deleted_by  varchar(100)
+
+  Note: '''
+    M-03. Kho/trung tâm phân phối vật liệu đến cửa hàng.
+    Thuộc 1 client (client_id) và 1 area (area_id).
+    Là delivery center mặc định của store (m_store.delivery_center_id).
+    Trong plan, delivery center có thể bị override (t_plan_store.delivery_center_id).
+    Unique: (client_id, code).
+    ⚠ m_client.fixed_center_id → id (circular ref — xem note ở m_client).
+  '''
+
+  indexes {
+    (client_id, code) [unique, name: 'uq_m_delivery_center_client_code']
+    client_id         [name: 'idx_m_delivery_center_client_id']
+    area_id           [name: 'idx_m_delivery_center_area_id']
+    status            [name: 'idx_m_delivery_center_status']
+  }
+}
+
+Table psms.m_store_patterns {
+  id          bigserial    [pk]
+  code        varchar(50)  [not null, note: 'Mã pattern (ví dụ: "00", "01", "10")']
+  name        varchar(100)  [not null, note: 'Tên pattern (ví dụ: 酒ありタバコあり)']
+  client_id   bigint        [not null, ref: > psms.m_clients.id, note: 'FK → m_client.id — pattern thuộc client nào']
+  description varchar(500)
+  status      varchar(20)  [not null, default: 'ACTIVE', note: 'ACTIVE | INACTIVE']
+  created_at  timestamptz  [not null, default: `now()`]
+  created_by  varchar(100) [not null]
+  updated_at  timestamptz  [not null, default: `now()`]
+  updated_by  varchar(100) [not null]
+  deleted_at  timestamptz
+  deleted_by  varchar(100)
+
+  Note: '''
+    M-04. Phân loại cửa hàng theo loại hình kinh doanh.
+    client_id NOT NULL: mỗi pattern thuộc 1 client.
+    Unique: (client_id, code).
+    Filter M-04: lọc theo client_id.
+  '''
+
+  indexes {
+    (client_id, code) [unique, name: 'uq_m_store_pattern_client_code']
+    client_id         [name: 'idx_m_store_pattern_client_id']
+    status            [name: 'idx_m_store_pattern_status']
+  }
+}
+
+Table psms.m_stores {
+  id                 bigserial    [pk]
+  store_no           varchar(20)  [not null, unique, note: '店番 — business unique key (ví dụ: "102")']
+  name               varchar(255) [not null]
+  client_id          bigint       [not null, ref: > psms.m_clients.id]
+  area_id            bigint       [not null, ref: > psms.m_areas.id]
+  delivery_center_id bigint       [not null, ref: > psms.m_delivery_centers.id, note: 'Default center — có thể override trong t_plan_store']
+  store_pattern_id   bigint       [ref: > psms.m_store_patterns.id]
+  postal_code        varchar(10)
+  prefecture         varchar(20)
+  address            varchar(500)
+  building_name      varchar(100) [note: '建物名 (ví dụ: ○○ビル5F)']
+  phone              varchar(20)
+  status             varchar(20)  [not null, default: 'ACTIVE', note: 'ACTIVE | CLOSED (閉店)']
+  created_at         timestamptz  [not null, default: `now()`]
+  created_by         varchar(100) [not null]
+  updated_at         timestamptz  [not null, default: `now()`]
+  updated_by         varchar(100) [not null]
+  deleted_at         timestamptz
+  deleted_by         varchar(100)
+
+  Note: '''
+    M-05. Cửa hàng nhận vật liệu quảng cáo.
+    store_no: business unique key (店番), dùng để import CSV và tìm kiếm.
+    delivery_center_id: center mặc định. Có thể override trong t_plan_store.delivery_center_id.
+    Tham gia vào plan qua t_plan_store.
+    CSV import: upload file → so sánh store_no → hiển thị diff → xác nhận.
+    CLOSED: cửa hàng đóng, không hiển thị trong plan creation mới.
+  '''
+
+  indexes {
+    store_no           [name: 'idx_m_store_store_no']
+    client_id          [name: 'idx_m_store_client_id']
+    area_id            [name: 'idx_m_store_area_id']
+    delivery_center_id [name: 'idx_m_store_delivery_center_id']
+    store_pattern_id   [name: 'idx_m_store_store_pattern_id']
+    status             [name: 'idx_m_store_status']
+  }
+}
+
+Table psms.m_materials {
+  id         bigserial     [pk]
+  code       varchar(50)   [not null, note: 'Mã vật liệu']
+  name       varchar(255)  [not null, note: 'Tên vật liệu (ví dụ: 期間限定キャンペーンPOP)']
+  client_id  bigint        [not null, ref: > psms.m_clients.id, note: 'FK → m_client.id — vật liệu thuộc client nào']
+  height_cm  numeric(8,2)  [note: '縦 (cm)']
+  width_cm   numeric(8,2)  [note: '横 (cm)']
+  depth_cm   numeric(8,2)  [note: '高さ/奥行き (cm)']
+  unit       varchar(20)   [note: 'Đơn vị tính: 個 | 枚 | 本 | 箱']
+  status     varchar(20)   [not null, default: 'ACTIVE', note: 'ACTIVE | INACTIVE']
+  created_at timestamptz   [not null, default: `now()`]
+  created_by varchar(100)  [not null]
+  updated_at timestamptz   [not null, default: `now()`]
+  updated_by varchar(100)  [not null]
+  deleted_at timestamptz
+  deleted_by varchar(100)
+
+  Note: '''
+    M-06. Vật liệu quảng cáo (poster, banner, brochure...).
+    client_id NOT NULL: mỗi vật liệu thuộc 1 client.
+    Kích thước: 3 cột riêng biệt (hiển thị dạng "HxWxD cm" trên UI).
+    Unique: (client_id, code).
+    Gắn vào plan qua t_plan_material; số lượng theo store qua t_plan_store_material.
+  '''
+
+  indexes {
+    (client_id, code) [unique, name: 'uq_m_material_client_code']
+    client_id         [name: 'idx_m_material_client_id']
+    status            [name: 'idx_m_material_status']
+  }
+}
+
+Table psms.m_delivery_companies {
+  id            bigserial    [pk]
+  code          varchar(50)  [not null, unique, note: '送り状コード — mã vận đơn, user nhập trên UI M-07']
+  name          varchar(255) [not null, note: 'Tên công ty (ví dụ: ヤマト運輸)']
+  contact_name  varchar(100)
+  contact_phone varchar(20)
+  status        varchar(20)  [not null, default: 'ACTIVE', note: 'ACTIVE | INACTIVE']
+  created_at    timestamptz  [not null, default: `now()`]
+  created_by    varchar(100) [not null]
+  updated_at    timestamptz  [not null, default: `now()`]
+  updated_by    varchar(100) [not null]
+  deleted_at    timestamptz
+  deleted_by    varchar(100)
+
+  Note: '''
+    M-07. Công ty vận chuyển hàng đến store.
+    code: 送り状コード — mã vận đơn, user nhập trên UI.
+    Gán vào client qua m_client.delivery_company_id (default).
+    Gán vào từng store trong plan qua t_plan_store.delivery_company_id (override).
+    ⚠ API config chi tiết (endpoint, credentials) chưa xác định — Open Question #3.
+  '''
+
+  indexes {
+    code   [name: 'idx_m_delivery_company_code']
+    status [name: 'idx_m_delivery_company_status']
+  }
+}
+
+Table psms.m_operators {
+  id         bigserial    [pk]
+  code       varchar(50)  [not null, unique, note: '従業員番号 — in ra thẻ QR để quét']
+  name       varchar(100) [not null]
+  email      varchar(254)
+  phone      varchar(20)
+  user_id    bigint       [ref: > psms.m_users.id, note: 'FK nullable — liên kết tài khoản hệ thống nếu có']
+  status     varchar(20)  [not null, default: 'ACTIVE', note: 'ACTIVE | INACTIVE']
+  created_at timestamptz  [not null, default: `now()`]
+  created_by varchar(100) [not null]
+  updated_at timestamptz  [not null, default: `now()`]
+  updated_by varchar(100) [not null]
+  deleted_at timestamptz
+  deleted_by varchar(100)
+
+  Note: '''
+    M-09. Nhân viên kho thực hiện đóng gói và quét QR.
+    code: 従業員番号, in ra thẻ QR — dùng để xác định người thực hiện khi quét.
+    user_id nullable: operator có thể không có tài khoản đăng nhập hệ thống.
+    Download thẻ PDF: tạo card có QR code từ operator.code.
+    Operator được ghi nhận tại cấp đếm (t_plan_store_material.counted_by), không phải per-store.
+  '''
+
+  indexes {
+    code    [name: 'idx_m_operator_code']
+    user_id [name: 'idx_m_operator_user_id']
+    status  [name: 'idx_m_operator_status']
+  }
+}
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  PLAN MANAGEMENT                                    ║
+// ║                                                     ║
+// ║  t_plan ──< t_plan_material         >── m_material  ║
+// ║         ──< t_plan_store            >── m_store     ║
+// ║         ──< t_plan_store_material                   ║
+// ║                (plan × store × material → quantity) ║
+// ║         ──< t_shipment_package      >── m_store     ║
+// ║                ──< t_shipment_item  >── m_material  ║
+// ╚══════════════════════════════════════════════════════╝
+
+Table psms.t_plans {
+  id                  bigserial    [pk]
+  code                varchar(50)  [not null, unique, note: '企画コード — business unique key']
+  title               varchar(255) [not null, note: '企画名']
+  order_no            varchar(50)  [note: '発注No. — nullable nếu chưa có khi tạo plan']
+  client_id           bigint       [not null, ref: > psms.m_clients.id]
+  deployment_start    date         [note: '展開期間 開始日 — dùng cho filter T-01 "kỳ triển khai (date range)"']
+  deployment_end      date         [note: '展開期間 終了日']
+  deployment_label    varchar(100) [note: 'Display label tùy chọn (ví dụ: "2月3週展開") — không dùng để filter']
+  scheduled_ship_date date         [note: '出荷予定日']
+  scheduled_del_date  date         [note: '納品予定日']
+  opp_count           integer      [note: 'OPP袋の数']
+  has_inserts         boolean      [not null, default: false, note: '同梱物の有無']
+  status              varchar(30)  [not null, default: 'UNPROCESSED', note: 'UNPROCESSED | IN_PROGRESS | SHIPPING | DELIVERED | COMPLETED | CANCELLED']
+  sato_sent_at        timestamptz  [note: 'Thời điểm gửi thông tin sang SATO → trigger chuyển sang IN_PROGRESS']
+  responsible_user_id bigint       [ref: > psms.m_users.id, note: 'FK — người phụ trách kế hoạch']
+  created_at          timestamptz  [not null, default: `now()`]
+  created_by          varchar(100) [not null]
+  updated_at          timestamptz  [not null, default: `now()`]
+  updated_by          varchar(100) [not null]
+  deleted_at          timestamptz
+  deleted_by          varchar(100)
+
+  Note: '''
+    T-01/P-01~P-05. Kế hoạch phân phối vật liệu quảng cáo.
+    Status flow:
+      UNPROCESSED (未対応)  → khi plan được tạo
+      IN_PROGRESS (進行中)  → khi sato_sent_at được set (gửi sang SATO)
+      SHIPPING    (配送中)  → khi có waybill (charter: khi toàn bộ đã kiểm đếm MATCHED)
+      DELIVERED   (配達完了) → khi API vận tải báo giao xong
+      COMPLETED   (完了)   → tự động sau 5 ngày từ DELIVERED
+      CANCELLED            → chỉ từ UNPROCESSED, không thể hồi phục
+    Xóa plan: chỉ khi status = UNPROCESSED.
+
+    P-01 count badge: derived từ t_plan_store_material.count_status
+      全完了     → tất cả MATCHED
+      カウント中  → có ít nhất 1 COUNTING
+      数量不一致  → có ít nhất 1 MISMATCH
+  '''
+
+  indexes {
+    code                          [name: 'idx_t_plan_code']
+    client_id                     [name: 'idx_t_plan_client_id']
+    responsible_user_id           [name: 'idx_t_plan_responsible_user_id']
+    (status, scheduled_ship_date) [name: 'idx_t_plan_status_ship_date']
+    (deployment_start, deployment_end) [name: 'idx_t_plan_deployment_period']
+  }
+}
+
+Table psms.t_plan_materials {
+  plan_id     bigint        [not null, ref: > psms.t_plans.id]
+  material_id bigint        [not null, ref: > psms.m_materials.id]
+  notes       varchar(2000)
+  created_at  timestamptz   [not null, default: `now()`]
+  created_by  varchar(100)  [not null]
+  updated_at  timestamptz   [not null, default: `now()`]
+  updated_by  varchar(100)  [not null]
+  deleted_at  timestamptz
+  deleted_by  varchar(100)
+
+  Note: '''
+    Junction: Plan ↔ Material (N:M).
+    Xác định LOẠI vật liệu nào có trong plan (không lưu số lượng ở đây).
+    Số lượng cụ thể theo từng store: t_plan_store_material.
+    Business rule: material phải thuộc cùng client với plan.
+  '''
+
+  indexes {
+    (plan_id, material_id) [pk, name: 'pk_t_plan_material']
+    plan_id                [name: 'idx_t_plan_material_plan_id']
+    material_id            [name: 'idx_t_plan_material_material_id']
+  }
+}
+
+Table psms.t_plan_stores {
+  plan_id             bigint        [not null, ref: > psms.t_plans.id]
+  store_id            bigint        [not null, ref: > psms.m_stores.id]
+  delivery_center_id  bigint        [ref: > psms.m_delivery_centers.id, note: 'Override center mặc định của store. null = dùng m_store.delivery_center_id']
+  delivery_company_id bigint        [ref: > psms.m_delivery_companies.id, note: 'Override delivery company. null = dùng m_client.delivery_company_id']
+  scheduled_date      date          [note: '配達予定日 cho store này']
+  shipped_at          timestamptz   [note: 'Thời điểm xuất kho thực tế']
+  delivered_at        timestamptz   [note: 'Thời điểm giao hàng thành công']
+  status              varchar(20)   [not null, default: 'PENDING', note: 'PENDING | PREPARING | SHIPPED | DELIVERED | FAILED | CANCELLED']
+  waybill_no          varchar(100)  [note: '送り状No. — từ API vận tải. null trước khi in vận đơn']
+  package_count       integer       [note: '個口数']
+  notes               varchar(2000)
+  created_at          timestamptz   [not null, default: `now()`]
+  created_by          varchar(100)  [not null]
+  updated_at          timestamptz   [not null, default: `now()`]
+  updated_by          varchar(100)  [not null]
+  deleted_at          timestamptz
+  deleted_by          varchar(100)
+
+  Note: '''
+    Junction: Plan ↔ Store (N:M) + delivery tracking per store.
+    delivery_center_id: OVERRIDE center mặc định cho riêng plan này.
+      Effective center query: COALESCE(ps.delivery_center_id, s.delivery_center_id)
+    P-01: group by effective_center_id → hiển thị tiến độ theo từng center.
+    P-02: thao tác đếm theo (plan_id, effective_center_id).
+    waybill_no: set sau khi gọi API vận tải thành công.
+    Business rule: store phải thuộc cùng client với plan.
+    ⚠ operator_id đã bị xóa (v3.1): operator được ghi nhận tại t_plan_store_material.counted_by.
+  '''
+
+  indexes {
+    (plan_id, store_id)           [pk, name: 'pk_t_plan_store']
+    (plan_id, delivery_center_id) [name: 'idx_t_plan_store_plan_center']
+    (plan_id, status)             [name: 'idx_t_plan_store_plan_status']
+    store_id                      [name: 'idx_t_plan_store_store_id']
+    delivery_company_id           [name: 'idx_t_plan_store_delivery_company_id']
+    scheduled_date                [name: 'idx_t_plan_store_scheduled_date']
+    waybill_no                    [name: 'idx_t_plan_store_waybill_no']
+  }
+}
+
+Table psms.t_plan_store_materials {
+  plan_id          bigint       [not null, ref: > psms.t_plans.id]
+  store_id         bigint       [not null, ref: > psms.m_stores.id]
+  material_id      bigint       [not null, ref: > psms.m_materials.id]
+  quantity         integer      [not null, default: 0, note: 'Số lượng kế hoạch (planned) — từ file import hoặc store master']
+  counted_quantity integer      [note: 'Số lượng thực tế đếm được tại kho (P-02). null = chưa đếm']
+  count_status     varchar(20)  [not null, default: 'PENDING', note: 'PENDING | COUNTING | MATCHED | MISMATCH']
+  counted_at       timestamptz  [note: 'Thời điểm hoàn thành đếm']
+  counted_by       bigint       [ref: > psms.m_operators.id, note: 'FK → m_operator.id — operator thực hiện đếm']
+  created_at       timestamptz  [not null, default: `now()`]
+  created_by       varchar(100) [not null]
+  updated_at       timestamptz  [not null, default: `now()`]
+  updated_by       varchar(100) [not null]
+  deleted_at       timestamptz
+  deleted_by       varchar(100)
+
+  Note: '''
+    3-way junction: Plan × Store × Material → số lượng + kết quả đếm.
+
+    quantity:         số lượng kế hoạch (planned, từ import Excel / store master)
+    counted_quantity: số lượng thực tế đếm tại kho (SATO scan result)
+    count_status:
+      PENDING   → chưa đếm
+      COUNTING  → đang trong quá trình đếm
+      MATCHED   → counted_quantity = quantity
+      MISMATCH  → counted_quantity ≠ quantity
+
+    P-01 count badge (derived từ bảng này):
+      全完了    → tất cả records có count_status = MATCHED
+      カウント中 → có ít nhất 1 COUNTING
+      数量不一致 → có ít nhất 1 MISMATCH (và không có COUNTING)
+
+    P-02 クリア (reset đếm): set counted_quantity = null, count_status = PENDING
+
+    Business rules (enforce ở app level):
+      (plan_id, material_id) phải tồn tại trong t_plan_material
+      (plan_id, store_id)    phải tồn tại trong t_plan_store
+  '''
+
+  indexes {
+    (plan_id, store_id, material_id) [pk, name: 'pk_t_plan_store_material']
+    (plan_id, store_id)              [name: 'idx_t_plan_store_material_plan_store']
+    (plan_id, material_id)           [name: 'idx_t_plan_store_material_plan_material']
+    count_status                     [name: 'idx_t_plan_store_material_count_status']
+    counted_by                       [name: 'idx_t_plan_store_material_counted_by']
+  }
+}
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  SHIPMENT TRACKING (ADM-04)                         ║
+// ║                                                     ║
+// ║  t_plan ──< t_shipment_package >── m_store          ║
+// ║             ──< t_shipment_item >── m_material      ║
+// ╚══════════════════════════════════════════════════════╝
+
+Table psms.t_shipment_packages {
+  id                  bigserial    [pk]
+  plan_id             bigint       [not null, ref: > psms.t_plans.id]
+  store_id            bigint       [not null, ref: > psms.m_stores.id]
+  delivery_company_id bigint       [ref: > psms.m_delivery_companies.id]
+  box_serial          varchar(100) [not null, unique, note: '外箱シリアル — từ SATO. Dùng để tìm kiếm trong ADM-04']
+  waybill_no          varchar(100) [note: '送り状No. — liên kết với t_plan_store.waybill_no']
+  status              varchar(20)  [not null, default: 'PACKED', note: 'PACKED | SHIPPED | DELIVERED | FAILED']
+  shipped_at          timestamptz
+  delivered_at        timestamptz
+  scanned_at          timestamptz  [note: 'Thời điểm scan tại SATO (ghi nhận đóng gói hoàn tất)']
+  created_at          timestamptz  [not null, default: `now()`]
+  created_by          varchar(100) [not null]
+  updated_at          timestamptz  [not null, default: `now()`]
+  updated_by          varchar(100) [not null]
+
+  Note: '''
+    ADM-04. Thùng ngoài (外箱) được đóng gói tại kho SATO.
+    box_serial: unique per box, nhận từ SATO sau khi scan.
+    waybill_no: foreign display key, liên kết với t_plan_store.waybill_no.
+    ADM-04 search by box_serial: partial match → highlight row + parent plan row.
+    Data source: SATO → HBLAB qua API callback sau khi packing hoàn tất.
+    ⚠ Không có soft delete: shipment packages là dữ liệu thực tế từ kho, không xóa.
+  '''
+
+  indexes {
+    box_serial          [name: 'idx_t_shipment_package_box_serial']
+    (plan_id, store_id) [name: 'idx_t_shipment_package_plan_store']
+    waybill_no          [name: 'idx_t_shipment_package_waybill_no']
+    status              [name: 'idx_t_shipment_package_status']
+    delivery_company_id [name: 'idx_t_shipment_package_delivery_company_id']
+  }
+}
+
+Table psms.t_shipment_items {
+  id          bigserial    [pk]
+  package_id  bigint       [not null, ref: > psms.t_shipment_packages.id]
+  material_id bigint       [not null, ref: > psms.m_materials.id]
+  serial_no   varchar(100) [note: '資材シリアル — from SATO. nullable: không phải vật liệu nào cũng có serial']
+  quantity    integer      [not null, default: 1, note: 'Số lượng vật liệu trong thùng này']
+  created_at  timestamptz  [not null, default: `now()`]
+  created_by  varchar(100) [not null]
+  updated_at  timestamptz  [not null, default: `now()`]
+  updated_by  varchar(100) [not null]
+
+  Note: '''
+    ADM-04. Vật liệu (資材) bên trong từng thùng ngoài.
+    serial_no: nullable — chỉ có với vật liệu có gắn RFID/barcode riêng.
+    ADM-04 search by serial_no: partial match → highlight item + hiển thị parent box row.
+    Data source: SATO → HBLAB qua API callback.
+    ⚠ Không có soft delete: dữ liệu thực tế từ kho.
+  '''
+
+  indexes {
+    package_id  [name: 'idx_t_shipment_item_package_id']
+    material_id [name: 'idx_t_shipment_item_material_id']
+    serial_no   [name: 'idx_t_shipment_item_serial_no']
+  }
+}
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  CHARTER SHIPMENT (チャーター)                       ║
+// ║                                                     ║
+// ║  t_plan ──< t_pallet >── m_delivery_center          ║
+// ║                      >── m_operator                  ║
+// ╚══════════════════════════════════════════════════════╝
+
+Table psms.t_pallets {
+  id                     bigserial    [pk]
+  plan_id                bigint       [not null, ref: > psms.t_plans.id, note: 'FK → t_plan.id — thuộc kế hoạch nào']
+  delivery_center_id     bigint       [not null, ref: > psms.m_delivery_centers.id, note: 'FK → m_delivery_center.id — pallet gửi đến center nào']
+  pallet_sequence        integer      [not null, note: 'Thứ tự pallet trong cùng plan + center (unique per plan+center)']
+  pallet_no              varchar(64)  [not null, unique, note: 'Mã pallet — in label, globally unique']
+  quantity               integer      [not null, default: 0, note: 'Số lượng box/unit trên pallet']
+  status                 varchar(20)  [not null, default: 'REGISTERED', note: 'REGISTERED | LABELED | SHIPPED | COMPLETED']
+  operator_id            bigint       [ref: > psms.m_operators.id, note: 'FK nullable → m_operator.id — operator thực hiện đóng gói pallet']
+  labeled_at             timestamptz  [note: 'Thời điểm in nhãn pallet hoàn tất']
+  shipped_at             timestamptz  [note: 'Thời điểm xuất kho']
+  created_at             timestamptz  [not null, default: `now()`]
+  created_by             varchar(100) [not null]
+  updated_at             timestamptz  [not null, default: `now()`]
+  updated_by             varchar(100) [not null]
+  deleted_at             timestamptz
+  deleted_by             varchar(100)
+
+  Note: '''
+    Pallet tracking cho luồng charter (チャーター利用).
+    Chỉ dùng khi m_client.delivery_method = CHARTER.
+    Luồng carrier (運送会社) dùng t_shipment_package + waybill thay vì pallet.
+
+    Charter flow:
+      ① Quét QR 担当者 + トリガー
+      ② Scan RFID → kiểm đếm số lượng
+      ③ Đăng ký pallet (tạo record, status = REGISTERED)
+      ④ In nhãn pallet (status → LABELED, set labeled_at)
+      ⑤ Xuất kho (status → SHIPPED, set shipped_at)
+      ⑥ Xác nhận hoàn tất (status → COMPLETED)
+
+    Status flow:
+      REGISTERED (登録済/未ラベル) → khi pallet được tạo
+      LABELED    (ラベル印刷済)    → khi in nhãn pallet xong
+      SHIPPED    (出荷手続済)      → khi xuất kho
+      COMPLETED  (完了)           → khi xác nhận giao hàng hoàn tất
+
+    pallet_no: globally unique, in trên label vật lý.
+    operator_id: FK → m_operator (không phải m_user) — nhân viên kho quét QR.
+    Soft delete: có — trường hợp hủy pallet trước khi ship.
+  '''
+
+  indexes {
+    (plan_id, delivery_center_id, pallet_sequence) [unique, name: 'uq_t_pallet_plan_center_seq']
+    pallet_no                                      [name: 'idx_t_pallet_pallet_no']
+    plan_id                                        [name: 'idx_t_pallet_plan_id']
+    delivery_center_id                             [name: 'idx_t_pallet_delivery_center_id']
+    status                                         [name: 'idx_t_pallet_status']
+    operator_id                                    [name: 'idx_t_pallet_operator_id']
+  }
+}
