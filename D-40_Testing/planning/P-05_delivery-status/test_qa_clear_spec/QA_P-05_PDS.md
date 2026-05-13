@@ -55,3 +55,4 @@ Nguồn phân tích: `requirements/P-05/P-05_配送ステータス_VN.md` (v1.0,
 [x] State/Status flow gap đã được kiểm tra nếu entity có trạng thái (Category 10)
 [x] Summary section được điền trước bảng gap
 ```
+

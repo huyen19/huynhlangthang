@@ -65,3 +65,4 @@ Tài liệu này không phải **màn hình trên browser**, mà mô tả layout
 | Ngày | Phiên bản | Nội dung sửa đổi | Người phụ trách |
 | --- | --- | --- | --- |
 | 2026-04-29 | 1.0 | Tạo mới | HieuNT1 |
+

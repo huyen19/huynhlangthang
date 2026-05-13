@@ -106,3 +106,4 @@ Số phần tử được đánh theo thứ tự: **§3.1 Filter/絞り込み**�
 | Ngày | Phiên bản | Nội dung sửa đổi | Người phụ trách |
 | --- | --- | --- | --- |
 | 2026-04-27 | 1.0 | Tạo mới | HieuNT1 |
+

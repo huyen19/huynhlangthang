@@ -57,3 +57,4 @@ Nguồn phân tích: `requirements/P-03/P-03_新規企画作成_VN.md` (v1.0, 20
 [x] State/Status flow gap đã được kiểm tra nếu entity có trạng thái (Category 10)
 [x] Summary section được điền trước bảng gap
 ```
+

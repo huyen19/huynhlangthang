@@ -181,3 +181,4 @@ Khởi tạo cho client sử dụng **charter delivery/チャーター便**. Cá
 | Ngày | Phiên bản | Nội dung sửa đổi | Người phụ trách |
 | --- | --- | --- | --- |
 | 2026-04-17 | 1.0 | Tạo mới | HieuNT1 |
+

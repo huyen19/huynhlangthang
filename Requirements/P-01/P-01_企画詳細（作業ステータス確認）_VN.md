@@ -297,3 +297,4 @@ Tên bảng/cột vật lý chuẩn xem **`BasicDesign/TOBE/DB`**（`テーブ�
 | Ngày | Phiên bản | Nội dung sửa đổi | Người phụ trách |
 | --- | --- | --- | --- |
 | 2026-04-17 | 1.0 | Tạo mới | HieuNT1 |
+

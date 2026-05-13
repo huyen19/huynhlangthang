@@ -72,3 +72,4 @@ Trước khi cho phép thao tác chỉnh sửa làm thay đổi dữ liệu gố
 | 2026-04-17 | 1.0 | Tạo mới | HieuNT1 |
 | 2026-04-29 | — | §5: chuẩn hóa tên logic DB; điều kiện cho upload lại theo **trạng thái plan**（chỉ **未対応** được phép）; **xóa = xóa logic** | - |
 | 2026-04-29 | — | **Chỉ preview**; khi sai thì xử lý bằng **upload lại**（§1・§2・§3・§5） | - |
+

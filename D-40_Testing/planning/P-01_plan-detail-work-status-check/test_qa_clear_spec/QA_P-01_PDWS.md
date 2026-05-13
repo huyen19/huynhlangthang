@@ -57,3 +57,4 @@ Nguồn phân tích: `requirements/P-01/P-01_企画詳細（作業ステータ�
 [x] State/Status flow gap đã được kiểm tra nếu entity có trạng thái (Category 10)
 [x] Summary section được điền trước bảng gap
 ```
+
