@@ -1,0 +1,11 @@
+{
+  "name": "feature-name-e2e",
+  "private": true,
+  "scripts": {
+    "test": "playwright test --config playwright.config.ts",
+    "test:headed": "playwright test --config playwright.config.ts --headed",
+    "test:ui": "playwright test --config playwright.config.ts --ui",
+    "test:report": "playwright show-report ../report/playwright-report",
+    "install:browsers": "playwright install chromium"
+  }
+}

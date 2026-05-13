@@ -55,7 +55,7 @@ Chọn kỹ thuật phù hợp với từng TVP dựa trên Test Type và đặc
 
 | Kỹ thuật | Áp dụng cho Test Type | Khi nào dùng |
 |----------|----------------------|--------------|
-| Equivalence Partitioning | Validation, Edge Case, Data | Field có nhiều nhóm giá trị hợp lệ / không hợp lệ |
+| Equivalence Partitioning | Validation, Edge Case, Data | Field có nhiều nhóm giá trị hợp lệ / không hợp lệ. **Mỗi equivalence class → 1 TC riêng biệt** (không gộp nhiều class vào 1 TC dù cùng TVP) |
 | Boundary Value Analysis | Edge Case, Data | Field có giới hạn ký tự, ngưỡng số, khoảng ngày |
 | Decision Table | Validation, Integration | Nhiều điều kiện kết hợp ảnh hưởng đến kết quả |
 | State Transition | UI, Functional, Negative | Entity có nhiều trạng thái chuyển đổi (申請→承認→完了) |
@@ -81,7 +81,8 @@ Với mỗi TVP, gán **Test Type** theo bảng dưới và tạo TC tương ứ
 **Quy tắc sinh TC:**
 - Mỗi TVP → ít nhất 1 TC
 - **Mỗi item được liệt kê trong TVP → 1 TC riêng**
-- TVP Priority Critical hoặc High → bắt buộc có cả TC positive lẫn negative`
+- TVP Priority Critical hoặc High → bắt buộc có cả TC positive lẫn negative
+- **EP/BVA**: Mỗi equivalence class hoặc boundary point → 1 TC riêng. ❌ Không dùng "Scenario A / B / C" trong cùng 1 TC row
 
 ## 4. Quy tắc quan trọng
 - KHÔNG dịch các UI labels, tên button, tên cột hoặc message/error message.

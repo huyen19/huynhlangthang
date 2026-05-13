@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{PROJECT_NAME}} — {{FEATURE_NAME}} — Test Tracker</title>
+<style>
+  :root {
+    --c-bg: #f5f7fa;
+    --c-surface: #ffffff;
+    --c-border: #e2e8f0;
+    --c-text: #1a202c;
+    --c-text-secondary: #718096;
+    --c-primary: #1e3a8a;
+    --c-primary-hover: #1e40af;
+    --c-pass: #38a169;
+    --c-pass-bg: #f0fff4;
+    --c-fail: #e53e3e;
+    --c-fail-bg: #fff5f5;
+    --c-pending: #d69e2e;
+    --c-pending-bg: #fffff0;
+    --c-skip: #a0aec0;
+    --c-skip-bg: #f7fafc;
+    --radius: 8px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:var(--c-bg); color:var(--c-text); line-height:1.5; }
+
+  /* ── Header ── */
+  .header { background:linear-gradient(135deg, var(--c-primary), #1a202c); color:#fff; padding:18px 24px; position:sticky; top:0; z-index:200; box-shadow:0 2px 8px rgba(0,0,0,.22); }
+  .header h1 { font-size:20px; font-weight:700; }
+  .header .subtitle { font-size:12px; opacity:.7; margin-top:2px; }
+
+  /* ── Summary bar ── */
+  .summary-bar { display:flex; gap:10px; flex-wrap:wrap; padding:10px 24px; background:var(--c-surface); border-bottom:1px solid var(--c-border); position:sticky; top:58px; z-index:199; }
+  .stat { display:flex; align-items:center; gap:5px; padding:4px 12px; border-radius:14px; font-size:12px; font-weight:600; }
+  .stat.total  { background:#edf2f7; color:var(--c-text); }
+  .stat.pass   { background:var(--c-pass-bg); color:var(--c-pass); }
+  .stat.fail   { background:var(--c-fail-bg); color:var(--c-fail); }
+  .stat.pending{ background:var(--c-pending-bg); color:var(--c-pending); }
+  .stat.skip   { background:var(--c-skip-bg); color:var(--c-skip); }
+  .progress-bar-container { flex:1; min-width:160px; display:flex; align-items:center; gap:8px; }
+  .progress-bar { flex:1; height:7px; background:#edf2f7; border-radius:4px; overflow:hidden; }
+  .progress-bar-inner { height:100%; border-radius:4px; transition:width .3s; }
+  .progress-pct { font-size:12px; font-weight:700; min-width:36px; text-align:right; }
+
+  /* ── Toolbar ── */
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; padding:10px 24px; align-items:center; background:var(--c-surface); border-bottom:1px solid var(--c-border); position:sticky; top:102px; z-index:198; }
+  .toolbar input[type="text"] { flex:1; min-width:180px; padding:6px 12px; border:1px solid var(--c-border); border-radius:6px; font-size:13px; outline:none; }
+  .toolbar input[type="text"]:focus { border-color:var(--c-primary); box-shadow:0 0 0 2px rgba(30,58,138,.12); }
+  .toolbar select { padding:6px 10px; border:1px solid var(--c-border); border-radius:6px; font-size:13px; background:#fff; cursor:pointer; }
+  .toolbar .btn { padding:6px 14px; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; }
+  .toolbar .btn-primary { background:var(--c-primary); color:#fff; }
+  .toolbar .btn-primary:hover { background:var(--c-primary-hover); }
+  .toolbar .btn-danger { background:var(--c-fail); color:#fff; }
+  .toolbar .btn-danger:hover { background:#c53030; }
+  .toolbar .btn-outline { background:transparent; border:1px solid var(--c-border); color:var(--c-text); }
+  .toolbar .btn-outline:hover { background:#edf2f7; }
+
+  /* ── Content ── */
+  .content { padding:16px 24px 64px; }
+
+  /* ── Group ── */
+  .group-section { margin-top:20px; }
+  .group-header { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--c-primary); color:#fff; border-radius:var(--radius) var(--radius) 0 0; cursor:pointer; user-select:none; }
+  .group-header h2 { font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; }
+  .group-header .toggle-icon { transition:transform .2s; font-size:11px; display:inline-block; }
+  .group-header .toggle-icon.collapsed { transform:rotate(-90deg); }
+  .group-header .group-stats { display:flex; gap:6px; font-size:11px; }
+  .group-header .group-stats span { padding:2px 8px; border-radius:8px; font-weight:600; }
+  .group-body { overflow:hidden; }
+  .group-body.collapsed { display:none; }
+
+  /* ── Table ── */
+  .table-scroll { overflow-x:auto; border:1px solid var(--c-border); border-top:none; border-radius:0 0 var(--radius) var(--radius); }
+  table.tc-table { border-collapse:collapse; font-size:12px; background:var(--c-surface); table-layout:auto; width:max-content; min-width:100%; }
+  .tc-table thead th {
+    padding:8px 10px; text-align:left; font-size:11px; font-weight:700;
+    color:var(--c-text-secondary); text-transform:uppercase; letter-spacing:.4px;
+    border-bottom:2px solid var(--c-border); white-space:nowrap; background:#f7fafc;
+  }
+
+  /* ── TC rows ── */
+  .tc-row td { padding:8px 10px; border-bottom:1px solid #f0f4f8; vertical-align:top; }
+  .tc-row:last-child td { border-bottom:none; }
+  .tc-row:hover td { background:#fafbfc; }
+  /* border-left via first td — transparent by default to avoid layout shift */
+  .tc-row td:first-child { border-left:3px solid transparent; }
+  .tc-row.status-pass td:first-child { border-left-color:var(--c-pass); }
+  .tc-row.status-fail td:first-child { border-left-color:var(--c-fail); }
+  .tc-row.status-skip td:first-child { border-left-color:var(--c-skip); }
+
+  .tc-id { font-weight:700; color:var(--c-primary); font-size:11px; white-space:nowrap; }
+  .tc-title { font-weight:600; font-size:12px; }
+
+  /* ── Cell clamp ── */
+  .cell-text { font-size:12px; line-height:1.45; color:var(--c-text); white-space:pre-wrap; word-break:break-word; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .cell-text.expanded { display:block; overflow:visible; }
+  .cell-expand-btn { display:inline-block; margin-top:3px; font-size:10px; color:var(--c-primary); cursor:pointer; background:none; border:none; padding:0; font-family:inherit; }
+  .cell-expand-btn:hover { text-decoration:underline; }
+
+  /* ── Actual cell ── */
+  .actual-wrap { position:relative; width:152px; }
+  .actual-wrap.required-fail::before { content:'* Bắt buộc'; display:block; font-size:10px; color:var(--c-fail); font-weight:700; margin-bottom:3px; }
+  .actual-textarea { width:100%; min-height:46px; padding:5px 7px; border:1px solid var(--c-border); border-radius:4px; font-size:11px; font-family:inherit; resize:vertical; background:#fff; color:var(--c-text); transition:border-color .15s; }
+  .actual-textarea:focus { outline:none; border-color:var(--c-primary); }
+  .required-fail .actual-textarea { border-color:var(--c-fail); background:var(--c-fail-bg); }
+
+  /* ── Status select ── */
+  .status-select { width:100%; padding:5px 6px; border:1px solid var(--c-border); border-radius:4px; font-size:11px; font-weight:600; cursor:pointer; background:#fff; transition:all .15s; }
+  .status-select.pass { background:var(--c-pass-bg); color:var(--c-pass); border-color:var(--c-pass); }
+  .status-select.fail { background:var(--c-fail-bg); color:var(--c-fail); border-color:var(--c-fail); }
+  .status-select.skip { background:var(--c-skip-bg); color:var(--c-skip); border-color:var(--c-skip); }
+
+  /* ── Badges ── */
+  .type-badge { display:inline-block; padding:2px 7px; border-radius:8px; font-size:10px; font-weight:600; background:#edf2f7; color:#4a5568; white-space:nowrap; }
+  .priority-badge { display:inline-block; padding:2px 7px; border-radius:8px; font-size:10px; font-weight:700; white-space:nowrap; }
+  .priority-badge.p1 { background:#fee2e2; color:#991b1b; }
+  .priority-badge.p2 { background:#fef3c7; color:#92400e; }
+  .priority-badge.p3 { background:#dbeafe; color:#1e40af; }
+  .priority-badge.p4 { background:#f3f4f6; color:#6b7280; }
+
+  /* ── Toast ── */
+  .toast { position:fixed; bottom:20px; right:20px; background:#1a202c; color:#fff; padding:9px 18px; border-radius:8px; font-size:12px; font-weight:600; opacity:0; transition:opacity .3s; pointer-events:none; z-index:999; }
+  .toast.show { opacity:1; }
+
+  /* ── Export modal ── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:300; }
+  .modal-overlay.active { display:flex; }
+  .modal { background:#fff; border-radius:12px; padding:24px; max-width:640px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+  .modal h3 { margin-bottom:14px; font-size:16px; }
+  .modal pre { background:#f7fafc; padding:12px; border-radius:6px; font-size:11px; overflow-x:auto; white-space:pre-wrap; max-height:380px; overflow-y:auto; }
+  .modal .btn { margin-top:12px; }
+
+  @media (max-width:768px) {
+    .header, .toolbar, .content, .summary-bar { padding-left:12px; padding-right:12px; }
+    .summary-bar { top:52px; }
+    .toolbar { top:94px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{PROJECT_NAME}} — {{FEATURE_NAME}}</h1>
+  <div class="subtitle">Manual Test Tracker — {{FEATURE_DATE}}</div>
+</div>
+
+<div class="summary-bar" id="summaryBar"></div>
+
+<div class="toolbar">
+  <input type="text" id="searchInput" placeholder="Tìm kiếm TC ID hoặc nội dung...">
+  <select id="statusFilter">
+    <option value="all">Tất cả trạng thái</option>
+    <option value="pending">Chưa test</option>
+    <option value="pass">Pass</option>
+    <option value="fail">Fail</option>
+    <option value="skip">Skip</option>
+  </select>
+  <select id="groupFilter">
+    <option value="all">Tất cả nhóm</option>
+  </select>
+  <select id="priorityFilter">
+    <option value="all">Tất cả priority</option>
+    <option value="P1">P1 Critical</option>
+    <option value="P2">P2 High</option>
+    <option value="P3">P3 Medium</option>
+    <option value="P4">P4 Low</option>
+  </select>
+  <button class="btn btn-outline" onclick="expandAll()">Mở tất cả</button>
+  <button class="btn btn-outline" onclick="collapseAll()">Thu gọn</button>
+  <button class="btn btn-primary" onclick="exportResults()">Xuất Markdown</button>
+  <button class="btn btn-danger" onclick="confirmReset()">Reset</button>
+</div>
+
+<div class="content" id="content"></div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <h3>Kết quả test (Markdown)</h3>
+    <pre id="exportContent"></pre>
+    <button class="btn btn-primary" onclick="copyExport()">Copy vào clipboard</button>
+    <button class="btn btn-outline" onclick="closeExportModal()" style="margin-left:8px">Đóng</button>
+  </div>
+</div>
+
+<script>
+// ==================== TEST DATA ====================
+// Mỗi case có các trường:
+//   id            — TC-ID duy nhất (vd: TC-ABC-001)
+//   tvpId         — TVP liên quan (vd: TVP-001)
+//   subSection    — Tên sub-section trong file TC
+//   title         — Test Description ngắn gọn
+//   preconditions — Điều kiện tiên quyết
+//   steps         — Các bước thực hiện (xuống dòng bằng \n)
+//   testData      — Dữ liệu test cụ thể (để trống '' nếu không có)
+//   expected      — Kết quả mong đợi
+//   testType      — UI | Functional | Integration | Negative | Edge Case | ...
+//   priority      — "P1" | "P2" | "P3" | "P4"
+//   note          — Ghi chú thêm (để trống '' nếu không có)
+//
+// Ví dụ:
+// const TEST_GROUPS = [
+//   {
+//     id: 'happy-path',
+//     name: 'Happy Path',
+//     cases: [
+//       {
+//         id: 'TC-XXX-001',
+//         tvpId: 'TVP-001',
+//         subSection: 'Happy Path',
+//         title: 'Tạo thành công với dữ liệu hợp lệ',
+//         preconditions: 'User đã đăng nhập với role phù hợp',
+//         steps: '1. Mở form\n2. Nhập dữ liệu\n3. Click Lưu',
+//         testData: 'Name: テスト太郎',
+//         expected: 'Lưu thành công, hiện toast xác nhận',
+//         testType: 'Functional',
+//         priority: 'P1',
+//         note: ''
+//       },
+//     ]
+//   },
+// ];
+
+const TEST_GROUPS = [
+  // TODO: Thay thế bằng test cases thực tế của feature
+  {
+    id: 'happy-path',
+    name: 'Happy Path',
+    cases: [
+      {
+        id: 'TC-FEAT-001',
+        tvpId: 'TVP-001',
+        subSection: 'Happy Path',
+        title: '[TEMPLATE] Tạo thành công với dữ liệu hợp lệ',
+        preconditions: 'User đã đăng nhập với role phù hợp',
+        steps: '1. Mở form\n2. Nhập dữ liệu hợp lệ\n3. Click Submit',
+        testData: '',
+        expected: 'Thành công, hiện toast xác nhận',
+        testType: 'Functional',
+        priority: 'P1',
+        note: ''
+      },
+    ]
+  },
+  {
+    id: 'negative-cases',
+    name: 'Negative Cases',
+    cases: [
+      {
+        id: 'TC-FEAT-002',
+        tvpId: 'TVP-002',
+        subSection: 'Negative Cases',
+        title: '[TEMPLATE] API lỗi 500 — hiển thị error state',
+        preconditions: 'Intercept API để trả về 500',
+        steps: '1. Cấu hình mock 500\n2. Navigate đến màn hình\n3. Quan sát',
+        testData: 'Mock: 500 Internal Server Error',
+        expected: 'Hiển thị thông báo lỗi, nút retry',
+        testType: 'Negative',
+        priority: 'P2',
+        note: ''
+      },
+    ]
+  },
+  {
+    id: 'edge-cases',
+    name: 'Edge Cases',
+    cases: [
+      {
+        id: 'TC-FEAT-003',
+        tvpId: 'TVP-003',
+        subSection: 'Edge Cases',
+        title: '[TEMPLATE] Click retry sau lỗi — API thành công',
+        preconditions: 'Đang ở trạng thái error state',
+        steps: '1. Restore API về bình thường\n2. Click [再試行]\n3. Quan sát',
+        testData: '',
+        expected: 'Skeleton → dữ liệu hiển thị, error state biến mất',
+        testType: 'Edge Case',
+        priority: 'P2',
+        note: ''
+      },
+    ]
+  },
+];
+
+// ==================== CONFIG ====================
+const STORAGE_KEY = '{{STORAGE_KEY}}';
+
+// ==================== STATE ====================
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+let state = loadState();
+
+function getTC(id) { return state[id] || { status: 'pending', actual: '' }; }
+function setTC(id, data) {
+  state[id] = { ...getTC(id), ...data };
+  saveState(state);
+  updateSummary();
+}
+
+// ==================== HELPERS ====================
+function getAllCases() {
+  return TEST_GROUPS.flatMap(g => g.cases.map(c => ({ ...c, groupId: g.id, groupName: g.name })));
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function cellClamp(text, uid, maxW) {
+  if (!text) return '<span style="color:#a0aec0;font-size:11px">—</span>';
+  const inner = `<div class="cell-text" id="${uid}">${esc(text).replace(/\n/g, '<br>')}</div>` +
+    `<button class="cell-expand-btn" onclick="toggleCell('${uid}')">▶ xem thêm</button>`;
+  return maxW ? `<div style="width:${maxW}">${inner}</div>` : inner;
+}
+
+function toggleCell(uid) {
+  const el = document.getElementById(uid);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  el.nextElementSibling.textContent = el.classList.contains('expanded') ? '▲ thu gọn' : '▶ xem thêm';
+}
+
+// ==================== SUMMARY ====================
+function updateSummary() {
+  const all = getAllCases();
+  const total = all.length;
+  let pass = 0, fail = 0, skip = 0, pending = 0;
+  all.forEach(c => {
+    const s = getTC(c.id).status;
+    if (s === 'pass') pass++;
+    else if (s === 'fail') fail++;
+    else if (s === 'skip') skip++;
+    else pending++;
+  });
+  const tested = pass + fail + skip;
+  const pct = total ? Math.round((tested / total) * 100) : 0;
+  const passRate = (pass + fail) ? Math.round((pass / (pass + fail)) * 100) : 0;
+
+  document.getElementById('summaryBar').innerHTML = `
+    <span class="stat total">Tổng: ${total}</span>
+    <span class="stat pass">✓ Pass: ${pass}</span>
+    <span class="stat fail">✗ Fail: ${fail}</span>
+    <span class="stat skip">— Skip: ${skip}</span>
+    <span class="stat pending">Chưa test: ${pending}</span>
+    <div class="progress-bar-container">
+      <div class="progress-bar">
+        <div class="progress-bar-inner" style="width:${pct}%;background:linear-gradient(90deg,var(--c-pass) ${passRate}%,var(--c-fail) ${passRate}%);"></div>
+      </div>
+      <span class="progress-pct">${pct}%</span>
+    </div>
+    <span class="stat" style="background:#e2e8f0;font-size:11px;">Pass rate: ${passRate}% (${pass}/${pass + fail})</span>
+  `;
+}
+
+function getPriorityClass(p) {
+  return { P1: 'p1', P2: 'p2', P3: 'p3', P4: 'p4' }[p] || 'p4';
+}
+
+// ==================== RENDER ====================
+function renderAll() {
+  const searchVal  = document.getElementById('searchInput').value.toLowerCase();
+  const statusVal  = document.getElementById('statusFilter').value;
+  const groupVal   = document.getElementById('groupFilter').value;
+  const prioVal    = document.getElementById('priorityFilter').value;
+  const content    = document.getElementById('content');
+  content.innerHTML = '';
+
+  TEST_GROUPS.forEach(grp => {
+    if (groupVal !== 'all' && grp.id !== groupVal) return;
+
+    const filtered = grp.cases.filter(c => {
+      const tc = getTC(c.id);
+      if (statusVal !== 'all' && tc.status !== statusVal) return false;
+      if (prioVal !== 'all' && c.priority !== prioVal) return false;
+      if (searchVal) {
+        const hay = [c.id, c.tvpId, c.title, c.steps, c.expected, c.note, c.testType].join(' ').toLowerCase();
+        if (!hay.includes(searchVal)) return false;
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) return;
+
+    let gp = 0, gf = 0, gs = 0;
+    grp.cases.forEach(c => {
+      const s = getTC(c.id).status;
+      if (s === 'pass') gp++; else if (s === 'fail') gf++; else if (s === 'skip') gs++;
+    });
+
+    const section = document.createElement('div');
+    section.className = 'group-section';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'group-header';
+    hdr.innerHTML = `
+      <h2>
+        <span class="toggle-icon">▼</span>
+        ${grp.name}
+        <span style="font-weight:400;font-size:11px;opacity:.7">(${filtered.length}/${grp.cases.length})</span>
+      </h2>
+      <div class="group-stats">
+        <span style="background:rgba(255,255,255,.2);color:#fff">✓ ${gp}</span>
+        <span style="background:rgba(255,255,255,.15);color:#fecaca">✗ ${gf}</span>
+        <span style="background:rgba(255,255,255,.1);color:#e2e8f0">— ${gs}</span>
+      </div>
+    `;
+
+    const bodyDiv = document.createElement('div');
+    bodyDiv.className = 'group-body';
+
+    const scrollDiv = document.createElement('div');
+    scrollDiv.className = 'table-scroll';
+
+    const table = document.createElement('table');
+    table.className = 'tc-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>TC ID</th><th>TVP ID</th><th>Sub-section</th>
+          <th>Test Description</th><th>Preconditions</th><th>Test Steps</th>
+          <th>Test Data</th><th>Expected Result</th><th>Actual</th>
+          <th>Status</th><th>Test Type</th><th>Priority</th><th>Note</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+
+    filtered.forEach(c => {
+      const tc = getTC(c.id);
+      const isFail = tc.status === 'fail';
+      const sc = tc.status !== 'pending' ? tc.status : '';
+
+      const tr = document.createElement('tr');
+      tr.className = `tc-row status-${tc.status}`;
+      tr.dataset.id = c.id;
+      tr.innerHTML = `
+        <td><span class="tc-id">${c.id}</span></td>
+        <td style="font-size:11px;color:var(--c-text-secondary);white-space:nowrap">${c.tvpId || '—'}</td>
+        <td style="font-size:11px">${esc(c.subSection) || '—'}</td>
+        <td style="font-weight:600">${cellClamp(c.title, 'title-' + c.id, '160px')}</td>
+        <td>${cellClamp(c.preconditions, 'pre-' + c.id, '155px')}</td>
+        <td>${cellClamp(c.steps, 'steps-' + c.id, '190px')}</td>
+        <td style="font-size:11px">${c.testData ? `<div style="width:110px;word-break:break-word;font-size:11px">${esc(c.testData)}</div>` : '<span style="color:#a0aec0">—</span>'}</td>
+        <td>${cellClamp(c.expected, 'exp-' + c.id, '190px')}</td>
+        <td>
+          <div class="actual-wrap${isFail ? ' required-fail' : ''}">
+            <textarea class="actual-textarea"
+              placeholder="${isFail ? 'Nhập kết quả thực tế (bắt buộc)...' : 'Ghi chú actual...'}"
+              onchange="setTC('${c.id}',{actual:this.value})">${tc.actual || ''}</textarea>
+          </div>
+        </td>
+        <td>
+          <select class="status-select ${sc}" onchange="handleStatusChange('${c.id}',this.value,this)">
+            <option value="pending" ${tc.status === 'pending' ? 'selected' : ''}>Chưa test</option>
+            <option value="pass"    ${tc.status === 'pass'    ? 'selected' : ''}>✓ Pass</option>
+            <option value="fail"    ${tc.status === 'fail'    ? 'selected' : ''}>✗ Fail</option>
+            <option value="skip"    ${tc.status === 'skip'    ? 'selected' : ''}>— Skip</option>
+          </select>
+        </td>
+        <td><span class="type-badge">${esc(c.testType) || '—'}</span></td>
+        <td><span class="priority-badge ${getPriorityClass(c.priority)}">${c.priority}</span></td>
+        <td style="font-size:11px;color:var(--c-text-secondary)">${c.note ? `<div style="width:120px;word-break:break-word">${esc(c.note)}</div>` : '—'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    hdr.addEventListener('click', () => {
+      bodyDiv.classList.toggle('collapsed');
+      hdr.querySelector('.toggle-icon').classList.toggle('collapsed');
+    });
+
+    scrollDiv.appendChild(table);
+    bodyDiv.appendChild(scrollDiv);
+    section.appendChild(hdr);
+    section.appendChild(bodyDiv);
+    content.appendChild(section);
+  });
+
+  updateSummary();
+}
+
+function handleStatusChange(id, value, selectEl) {
+  setTC(id, { status: value });
+  selectEl.className = `status-select${value !== 'pending' ? ' ' + value : ''}`;
+  const row = selectEl.closest('.tc-row');
+  row.className = `tc-row status-${value}`;
+
+  const wrap = row.querySelector('.actual-wrap');
+  if (value === 'fail') {
+    wrap.classList.add('required-fail');
+    wrap.querySelector('.actual-textarea').placeholder = 'Nhập kết quả thực tế (bắt buộc)...';
+  } else {
+    wrap.classList.remove('required-fail');
+    wrap.querySelector('.actual-textarea').placeholder = 'Ghi chú actual...';
+  }
+}
+
+function expandAll() {
+  document.querySelectorAll('.group-body').forEach(b => b.classList.remove('collapsed'));
+  document.querySelectorAll('.toggle-icon').forEach(i => i.classList.remove('collapsed'));
+}
+function collapseAll() {
+  document.querySelectorAll('.group-body').forEach(b => b.classList.add('collapsed'));
+  document.querySelectorAll('.toggle-icon').forEach(i => i.classList.add('collapsed'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function exportResults() {
+  const all = getAllCases();
+
+  // Validate: Fail without Actual
+  const missing = all.filter(c => getTC(c.id).status === 'fail' && !(getTC(c.id).actual || '').trim());
+  if (missing.length > 0) {
+    const ids = missing.map(c => c.id).join(', ');
+    if (!confirm(`${missing.length} TC Fail chưa nhập Actual Result:\n${ids}\n\nVẫn xuất?`)) return;
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  let pass = 0, fail = 0, skip = 0;
+  all.forEach(c => {
+    const s = getTC(c.id).status;
+    if (s === 'pass') pass++; else if (s === 'fail') fail++; else if (s === 'skip') skip++;
+  });
+  const total = all.length;
+
+  const lines = [
+    `# Test Results — {{FEATURE_NAME}}`,
+    `Ngày: ${today}`, '',
+    `## Tổng kết: ${pass} Pass / ${fail} Fail / ${skip} Skip / ${total - pass - fail - skip} Chưa test (Tổng ${total})`, '',
+  ];
+
+  if (fail > 0) {
+    lines.push('## Danh sách FAIL', '');
+    lines.push('| TC ID | TVP ID | Test Description | Priority | Actual Result |');
+    lines.push('|---|---|---|---|---|');
+    all.forEach(c => {
+      const tc = getTC(c.id);
+      if (tc.status === 'fail')
+        lines.push(`| ${c.id} | ${c.tvpId || ''} | ${c.title} | ${c.priority} | ${tc.actual || '(chưa nhập)'} |`);
+    });
+    lines.push('');
+  }
+
+  lines.push('## Chi tiết theo nhóm', '');
+  TEST_GROUPS.forEach(grp => {
+    lines.push(`### ${grp.name}`);
+    lines.push('| TC ID | TVP ID | Sub-section | Test Description | Test Type | Priority | Status | Actual | Note |');
+    lines.push('|---|---|---|---|---|---|---|---|---|');
+    grp.cases.forEach(c => {
+      const tc = getTC(c.id);
+      const lbl = { pending: 'Chưa test', pass: 'Pass', fail: 'Fail', skip: 'Skip' }[tc.status] || tc.status;
+      lines.push(`| ${c.id} | ${c.tvpId || ''} | ${c.subSection || ''} | ${c.title} | ${c.testType || ''} | ${c.priority} | ${lbl} | ${tc.actual || ''} | ${c.note || ''} |`);
+    });
+    lines.push('');
+  });
+
+  document.getElementById('exportContent').textContent = lines.join('\n');
+  document.getElementById('exportModal').classList.add('active');
+}
+
+function copyExport() {
+  navigator.clipboard.writeText(document.getElementById('exportContent').textContent)
+    .then(() => { closeExportModal(); showToast('Đã copy vào clipboard!'); })
+    .catch(() => alert('Copy thất bại — hãy copy thủ công.'));
+}
+function closeExportModal() { document.getElementById('exportModal').classList.remove('active'); }
+
+function confirmReset() {
+  if (confirm('Reset tất cả kết quả test? Thao tác này không thể hoàn tác!')) {
+    state = {};
+    saveState(state);
+    renderAll();
+  }
+}
+
+// Init group filter dropdown
+const groupFilter = document.getElementById('groupFilter');
+TEST_GROUPS.forEach(g => {
+  const opt = document.createElement('option');
+  opt.value = g.id;
+  opt.textContent = g.name;
+  groupFilter.appendChild(opt);
+});
+
+document.getElementById('searchInput').addEventListener('input', renderAll);
+document.getElementById('statusFilter').addEventListener('change', renderAll);
+document.getElementById('groupFilter').addEventListener('change', renderAll);
+document.getElementById('priorityFilter').addEventListener('change', renderAll);
+
+renderAll();
+</script>
+</body>
+</html>

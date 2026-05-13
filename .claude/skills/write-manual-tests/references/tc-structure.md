@@ -51,20 +51,20 @@ Ví dụ: `TC-HMCM-S01-001`, `TC-HMCM-S01-002`, `TC-HMCM-S05-001`, `TC-HMCM-S05-
 | **Test Steps** | ✔ | Các bước thực hiện theo thứ tự | Đánh số, nối bằng `<br>` |
 | **Test Data** | — | Giá trị input cụ thể dùng trong test | Giá trị literal; để `-` nếu không cần |
 | **Expected Result** | ✔ | Kết quả quan sát được trên UI hoặc response — **phải đo lường được** | Đánh số, nối bằng `<br>` |
-| **Status** | — | Kết quả test (tester điền) | `Open` / `Pass` / `Fail` / `Skip` |
-| **Actual** | — | Kết quả thực tế (tester điền khi chạy) | *(để trống)* |
 | **Note** | — | Ghi chú khi chạy test (bug ref, điều kiện đặc biệt, v.v.) | *(để trống)* |
-| **Test Type** | ✔ | Phân loại test case | `UI` / `Functional` / `Validation` / `Integration` / `Negative` / `Edge Case` / `Data` |
+| **Result (Manual)** | — | Kết quả manual test — sync từ HTML tracker qua `/sync-tc-results` | `PASS` / `FAIL` / `IMPACT` / `Not Run` / `Open` / `Skip` |
+| **Actual** | — | Kết quả thực tế (tester điền khi chạy) | *(để trống)* |
+| **Result (Auto)** | — | Kết quả automation test — sync từ Playwright qua `/sync-tc-results` | `PASS` / `FAIL` / `Skip` |
 | **Priority** | ✔ | Mức độ ưu tiên | `Critical` / `High` / `Medium` / `Low` |
-| **Method Test** | ✔ | Đề xuất phương thức thực thi | `Auto` / `Manual` |
+| **Test Type** | ✔ | Phân loại test case | `UI` / `Functional` / `Validation` / `Integration` / `Negative` / `Edge Case` / `Data` |
 
 ---
 
 ## 4. Format bảng
 
 ```markdown
-| TC ID | TVP ID | Sub-section | Test Description | Preconditions | Test Steps | Test Data | Expected Result | Status | Actual | Note | Test Type | Priority | Method Test |
-|-------|--------|------------|-----------------|---------------|------------|-----------|-----------------|--------|--------|------|-----------|----------|-------------|
+| TC ID | TVP ID | Sub-section | Test Description | Preconditions | Test Steps | Test Data | Expected Result | Note | Result (Manual) | Actual | Result (Auto) | Priority | Test Type |
+|-------|--------|------------|-----------------|---------------|------------|-----------|-----------------|------|-----------------|--------|---------------|----------|-----------|
 ```
 
 ---
@@ -94,10 +94,10 @@ Dùng `<br>` để xuống dòng — **KHÔNG** dùng newline thật hoặc dấ
 
 ## 6. Ví dụ hàng đầy đủ
 
-| TC ID | TVP ID | Sub-section | Test Description | Preconditions | Test Steps | Test Data | Expected Result | Status | Actual | Note | Test Type | Priority | Method Test |
-|-------|--------|------------|-----------------|---------------|------------|-----------|-----------------|--------|--------|------|-----------|----------|-------------|
-| TC-HMCM-S01-001 | TVP-001 | Screen Init | Page title「社宅管理会社マスタ」hiển thị đúng | 1. User đăng nhập với ROLE_HR_ADMIN<br>2. App đang chạy port 4005 | 1. Navigate đến `/benefits/master/housing-management-companies`<br>2. Chờ skeleton loader biến mất<br>3. Quan sát vùng tiêu đề và breadcrumb | — | 1. Page title hiển thị「社宅管理会社マスタ」<br>2. Breadcrumb hiển thị đúng cấu trúc nền tảng | | | | UI | High | Auto |
-| TC-HMCM-S05-001 | TVP-039 | Validation | FLD-001 bỏ trống → inline error VAL-001 | 1. User đăng nhập với ROLE_HR_ADMIN<br>2. Modal 新規登録 đang mở | 1. Để trống field 管理会社コード<br>2. Click nút 登録 | (rỗng) | 1. Inline error hiển thị dưới FLD-001:「管理会社コードを入力してください。」<br>2. Modal không đóng<br>3. Không có request API nào được gọi | | | | Negative | Critical | Auto |
+| TC ID | TVP ID | Sub-section | Test Description | Preconditions | Test Steps | Test Data | Expected Result | Note | Result (Manual) | Actual | Result (Auto) | Priority | Test Type |
+|-------|--------|------------|-----------------|---------------|------------|-----------|-----------------|------|-----------------|--------|---------------|----------|-----------|
+| TC-HMCM-S01-001 | TVP-001 | Screen Init | Page title「社宅管理会社マスタ」hiển thị đúng | 1. User đăng nhập với ROLE_HR_ADMIN<br>2. App đang chạy port 4005 | 1. Navigate đến `/benefits/master/housing-management-companies`<br>2. Chờ skeleton loader biến mất<br>3. Quan sát vùng tiêu đề và breadcrumb | — | 1. Page title hiển thị「社宅管理会社マスタ」<br>2. Breadcrumb hiển thị đúng cấu trúc nền tảng | | | | | High | UI |
+| TC-HMCM-S05-001 | TVP-039 | Validation | FLD-001 bỏ trống → inline error VAL-001 | 1. User đăng nhập với ROLE_HR_ADMIN<br>2. Modal 新規登録 đang mở | 1. Để trống field 管理会社コード<br>2. Click nút 登録 | (rỗng) | 1. Inline error hiển thị dưới FLD-001:「管理会社コードを入力してください。」<br>2. Modal không đóng<br>3. Không có request API nào được gọi | | | | | Critical | Negative |
 
 ---
 
@@ -181,21 +181,12 @@ TC-B: "Nút X enabled khi chọn ≥1 đơn"            → Expected: Nút X ena
 ### Priority
 - Bao gồm: `Critical` / `High` / `Medium` / `Low`
 
-### Method Test
-- Đề xuất phương thức thực thi phù hợp nhất cho TC này
-- Giá trị: `Auto` / `Manual`
+### Result (Manual)
+- Kết quả chạy manual test — được sync tự động từ HTML tracker qua `/sync-tc-results --source=manual`
+- **Không điền tay** — để trống khi viết TC; chỉ update qua script
+- Giá trị: `PASS` / `FAIL` / `IMPACT` / `Not Run` / `Open` / `Skip`
 
-| Giá trị | Khi nào dùng |
-|---------|--------------|
-| `Auto` | TC có steps xác định, input/output rõ ràng, có thể lặp lại nhiều lần — phù hợp Playwright/Selenium |
-| `Manual` | TC yêu cầu phán đoán thị giác, kiểm tra UX/cảm quan, môi trường khó mock, hoặc luồng phức tạp khó tự động hóa |
-
-**Hướng dẫn gán giá trị:**
-- `UI` + layout/label tĩnh → `Auto`
-- `Functional` + luồng chính → `Auto`
-- `Validation` + inline error → `Auto`
-- `Integration` + API request/response → `Auto`
-- `Negative` + API error → `Auto`
-- `Edge Case` + giá trị biên → `Auto`
-- `Data` + DB mapping → `Manual` (cần verify DB trực tiếp)
-- TC có điều kiện môi trường đặc biệt hoặc phụ thuộc dữ liệu production → `Manual`
+### Result (Auto)
+- Kết quả chạy automation test — được sync tự động từ Playwright JSON report qua `/sync-tc-results --source=auto`
+- **Không điền tay** — để trống khi viết TC; chỉ update qua script
+- Giá trị: `PASS` / `FAIL` / `Skip`
