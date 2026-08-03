@@ -1,0 +1,12 @@
+[
+  { "name": "Áo Khoác", "code": "AK" },
+  { "name": "Quần Dài", "code": "QD" },
+  { "name": "Giày", "code": "G" },
+  { "name": "Balo", "code": "BL" },
+  { "name": "Mũ", "code": "M" },
+  { "name": "Kính", "code": "K" },
+  { "name": "Ủng", "code": "U" },
+  { "name": "Phụ Kiện", "code": "PK" },
+  { "name": "Gile", "code": "GL" },
+  { "name": "Quần Short", "code": "QS" }
+]

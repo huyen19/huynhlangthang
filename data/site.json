@@ -1,0 +1,35 @@
+{
+  "logo": "/images/huyen/avatar.jpg",
+  "name": "Huyền Lang Thang",
+  "companyLine": "Công ty TNHH HLT Travel",
+  "phone": "0986.202.220",
+  "email": "huyenlangthang@gmail.com",
+  "address": "Hà Nội, Việt Nam",
+  "facebook": "https://www.facebook.com/huyenntk98",
+  "tiktok": "https://www.tiktok.com/@huyenlangthangvn",
+  "heroImage": "/images/huyen/cover.jpg",
+  "heroTitleLine1": "Cùng Huyền Lang Thang",
+  "heroTitleLine2": "Biến những chuyến đi trở thành hành trình ý nghĩa",
+  "heroSubtitle": "Nơi kết hợp hoàn hảo giữa Du Lịch & Thiện Nguyện",
+  "aboutTag": "Về chúng tôi",
+  "aboutTitleLine1": "Khám Phá & Lan Toả",
+  "aboutTitleLine2": "Cùng Huyền Lang Thang",
+  "aboutText1": "**Huyền Lang Thang** không chỉ cung cấp các hành trình trekking chinh phục thiên nhiên hùng vĩ, mà còn mang đến những chuyến đi **chạm đến trái tim**.",
+  "aboutText2": "Với mỗi lượt tham gia tour, bạn đang đóng góp **50.000đ** vào Quỹ Thiện Nguyện để xây dựng trường học và tặng quà cho trẻ em vùng cao.",
+  "features": [
+    { "title": "Hướng dẫn viên tận tâm", "desc": "Năng động, nhiệt tình, mang đến trải nghiệm thân thiện và an toàn tuyệt đối." },
+    { "title": "Ẩm thực phong phú", "desc": "Thực đơn đa dạng, đầy đủ dinh dưỡng, hỗ trợ đồ ăn chay theo yêu cầu." },
+    { "title": "Du lịch & Thiện nguyện", "desc": "Trực tiếp tham gia trao quà cho các bé vùng cao trên cung đường trekking." },
+    { "title": "Năng lượng tích cực", "desc": "Cộng đồng trẻ, yêu khám phá và sẻ chia, tạo nên không khí sôi nổi, vui vẻ." }
+  ],
+  "footerText": "Không chỉ là những bước chân chinh phục thiên nhiên, chúng tôi mang theo sứ mệnh kết nối cộng đồng. Mỗi hành trình cùng HLT là một cơ hội để bạn góp phần lan toả yêu thương, xây dựng trường học và hỗ trợ trẻ em vùng cao.",
+  "copyright": "© 2026 Huyền Lang Thang Travel. All rights reserved.",
+  "finance": {
+    "title": "Minh Bạch Tài Chính",
+    "subtitle": "Tổng kết hoạt động từ 09/2024 đến nay",
+    "totalRaised": "1.118.676.362 ₫",
+    "totalUsed": "813.300.500 ₫",
+    "currentBalance": "305.375.862 ₫",
+    "statementLink": "https://thiennguyen.app/user/hanhtrinhyeuthuong"
+  }
+}

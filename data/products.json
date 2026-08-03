@@ -1,0 +1,1141 @@
+[
+  {
+    "id": "69cd4497e9d4540ee8501821",
+    "name": "Gile dáng rộng",
+    "price": 210000,
+    "originalPrice": 103200,
+    "sold": 0,
+    "category": "Gile",
+    "colors": [
+      "Đen",
+      "Xanh rêu nhạt"
+    ],
+    "image": "/images/products/69cd4497e9d4540ee8501821.jpg"
+  },
+  {
+    "id": "69cd441ee9d4540ee8500e34",
+    "name": "Gile thời trang tùy chỉnh đa chức năng",
+    "price": 330000,
+    "originalPrice": 232000,
+    "sold": 6,
+    "category": "Gile",
+    "colors": [
+      "Đen",
+      "Vàng be"
+    ],
+    "image": "/images/products/69cd441ee9d4540ee8500e34.jpg"
+  },
+  {
+    "id": "69cd3795e9d4540ee84feabd",
+    "name": "Quần leo núi ngoài trời",
+    "price": 350000,
+    "originalPrice": 236000,
+    "sold": 4,
+    "category": "Quần Dài",
+    "colors": [
+      "Trắng",
+      "Vàng kem",
+      "Xanh rêu nhạt",
+      "Đen"
+    ],
+    "image": "/images/products/69cd3795e9d4540ee84feabd.jpg"
+  },
+  {
+    "id": "69cd366be9d4540ee84fea78",
+    "name": "Quần short thể thao mùa hè",
+    "price": 220000,
+    "originalPrice": 100000,
+    "sold": 8,
+    "category": "Quần Short",
+    "colors": [
+      "Hồng đào",
+      "Tím mộng",
+      "Xanh đen",
+      "Đen"
+    ],
+    "image": "/images/products/69cd366be9d4540ee84fea78.jpg"
+  },
+  {
+    "id": "69cd3411e9d4540ee84fb58d",
+    "name": "Quần cargo ngoài trời tháo rời ống",
+    "price": 330000,
+    "originalPrice": 192000,
+    "sold": 9,
+    "category": "Quần Dài",
+    "colors": [
+      "Ghi",
+      "Xanh rêu",
+      "Đen"
+    ],
+    "image": "/images/products/69cd3411e9d4540ee84fb58d.jpg"
+  },
+  {
+    "id": "69cd3274e9d4540ee84fb102",
+    "name": "Quần dài/quần ngắn nhanh khô, thiết kế hai mảnh có thể tháo rời",
+    "price": 340000,
+    "originalPrice": 180000,
+    "sold": 6,
+    "category": "Quần Dài",
+    "colors": [
+      "Be",
+      "Đen",
+      "Nâu sữa",
+      "Xanh rêu"
+    ],
+    "image": "/images/products/69cd3274e9d4540ee84fb102.jpg"
+  },
+  {
+    "id": "69cd30eae9d4540ee84facb6",
+    "name": "Quần leo núi quần dài hai mảnh thoáng khí có thể tháo rời",
+    "price": 340000,
+    "originalPrice": 180000,
+    "sold": 1,
+    "category": "Quần Dài",
+    "colors": [
+      "Xanh rêu",
+      "Đen"
+    ],
+    "image": "/images/products/69cd30eae9d4540ee84facb6.jpg"
+  },
+  {
+    "id": "69cd2e8de9d4540ee84f9be6",
+    "name": "Gile đa năng cổ đứng",
+    "price": 360000,
+    "originalPrice": 236000,
+    "sold": 14,
+    "category": "Gile",
+    "colors": [
+      "Nâu đất",
+      "Tím tro",
+      "Xanh rêu nhạt",
+      "Đen"
+    ],
+    "image": "/images/products/69cd2e8de9d4540ee84f9be6.jpg"
+  },
+  {
+    "id": "69cd2d31e9d4540ee84f94a9",
+    "name": "Giày leo núi ngoài trời, mũi rộng, thoáng khí, chống trơn trượt",
+    "price": 440000,
+    "originalPrice": 260000,
+    "sold": 8,
+    "category": "Giày",
+    "colors": [
+      "Hồng nude",
+      "Trắng"
+    ],
+    "image": "/images/products/69cd2d31e9d4540ee84f94a9.jpg"
+  },
+  {
+    "id": "69cd2bb0e9d4540ee84f933d",
+    "name": "Mũ tai bèo phối màu",
+    "price": 120000,
+    "originalPrice": 47200,
+    "sold": 1,
+    "category": "Mũ",
+    "colors": [
+      "Xanh rêu"
+    ],
+    "image": "/images/products/69cd2bb0e9d4540ee84f933d.jpg"
+  },
+  {
+    "id": "69cd2b30e9d4540ee84f9337",
+    "name": "Mũ rộng vành, nhanh khô, phối màu, chống nắng ngoài trời, mũ đi bộ đường dài, chống thấm nước và chắn gió",
+    "price": 150000,
+    "originalPrice": 67200,
+    "sold": 11,
+    "category": "Mũ",
+    "colors": [
+      "Kem",
+      "Vàng be",
+      "Xanh rêu olive",
+      "Đen"
+    ],
+    "image": "/images/products/69cd2b30e9d4540ee84f9337.jpg"
+  },
+  {
+    "id": "69cd2a2fe9d4540ee84f9329",
+    "name": "Mũ lưỡi trai đa năng chống nắng và che nắng, kiểu dáng Nhật Bản cổ điển, vành phẳng.",
+    "price": 140000,
+    "originalPrice": 92000,
+    "sold": 4,
+    "category": "Mũ",
+    "colors": [
+      "Cam đậm",
+      "Xám nhạt",
+      "Đen"
+    ],
+    "image": "/images/products/69cd2a2fe9d4540ee84f9329.jpg"
+  },
+  {
+    "id": "69cd280be9d4540ee84f82cf",
+    "name": "Kính râm thể thao ngoài trời, leo núi",
+    "price": 100000,
+    "originalPrice": 48000,
+    "sold": 7,
+    "category": "Kính",
+    "colors": [
+      "Đen",
+      "Hồng phấn",
+      "Xám Vàng",
+      "Xanh teal"
+    ],
+    "image": "/images/products/69cd280be9d4540ee84f82cf.jpg"
+  },
+  {
+    "id": "69ccf209e9d4540ee84ef660",
+    "name": "Kính phong cách punk, gọng nhỏ, kiểu dáng thể thao, unisex",
+    "price": 150000,
+    "originalPrice": 72000,
+    "sold": 1,
+    "category": "Kính",
+    "colors": [
+      "Xám nhạt",
+      "Đỏ cam"
+    ],
+    "image": "/images/products/69ccf209e9d4540ee84ef660.jpg"
+  },
+  {
+    "id": "69ccef14e9d4540ee84ef543",
+    "name": "Kính râm mắt mèo thời trang dành cho nữ",
+    "price": 60000,
+    "originalPrice": 24000,
+    "sold": 3,
+    "category": "Kính",
+    "colors": [
+      "Đen"
+    ],
+    "image": "/images/products/69ccef14e9d4540ee84ef543.jpg"
+  },
+  {
+    "id": "69441c4f83f638038c49f742",
+    "name": "Mũ lưỡi trai rách thời thượng mới năm 2025",
+    "price": 120000,
+    "originalPrice": 55000,
+    "sold": 14,
+    "category": "Mũ",
+    "colors": [
+      "Be",
+      "Tím",
+      "Đỏ đô"
+    ],
+    "image": "/images/products/69441c4f83f638038c49f742.jpg"
+  },
+  {
+    "id": "69415919c25c570ef9563af4",
+    "name": "Áo khoác ngoài trời chống gió và chống thấm nước",
+    "price": 400000,
+    "originalPrice": 234000,
+    "sold": 25,
+    "category": "Áo Khoác",
+    "colors": [
+      "Cam",
+      "Xanh bạc hà",
+      "Đỏ rượu"
+    ],
+    "image": "/images/products/69415919c25c570ef9563af4.jpg"
+  },
+  {
+    "id": "694156aac25c570ef9562b3a",
+    "name": "Áo khoác chống thấm nước ngoài trời hiệu Bird",
+    "price": 450000,
+    "originalPrice": 269000,
+    "sold": 24,
+    "category": "Áo Khoác",
+    "colors": [
+      "Tím huế",
+      "Xanh băng",
+      "Xanh xám"
+    ],
+    "image": "/images/products/694156aac25c570ef9562b3a.jpg"
+  },
+  {
+    "id": "69414c46c25c570ef956048c",
+    "name": "Áo khoác softshell có mũ trùm đầu HUMBLE STONE, có trượt nước",
+    "price": 500000,
+    "originalPrice": 275000,
+    "sold": 22,
+    "category": "Áo Khoác",
+    "colors": [
+      "Trắng ngà",
+      "Xanh bơ",
+      "Xanh lam nhạt",
+      "Xanh ngọc bích",
+      "Đỏ cam"
+    ],
+    "image": "/images/products/69414c46c25c570ef956048c.jpg"
+  },
+  {
+    "id": "69303691795da6a2e1e620df",
+    "name": "Quần chống nước, chống gió, có đai, nhung, dáng rộng",
+    "price": 330000,
+    "originalPrice": 187000,
+    "sold": 2,
+    "category": "Quần Dài",
+    "colors": [
+      "Đen"
+    ],
+    "image": "/images/products/69303691795da6a2e1e620df.jpg"
+  },
+  {
+    "id": "6912fa6586c7b090c18b6f0b",
+    "name": "Mũ len phong cách Fair Isle nữ",
+    "price": 60000,
+    "originalPrice": 15100,
+    "sold": 10,
+    "category": "Mũ",
+    "colors": [
+      "Ngà",
+      "Nâu đất"
+    ],
+    "image": "/images/products/6912fa6586c7b090c18b6f0b.jpg"
+  },
+  {
+    "id": "6912f82f86c7b090c18b6063",
+    "name": "Kính thể thao ngoài trời",
+    "price": 80000,
+    "originalPrice": 33150,
+    "sold": 10,
+    "category": "Kính",
+    "colors": [
+      "Cam",
+      "Đen"
+    ],
+    "image": "/images/products/6912f82f86c7b090c18b6063.jpg"
+  },
+  {
+    "id": "6912f7b286c7b090c18b605e",
+    "name": "Kính bảo hộ leo núi, kính râm chống gió đi xe đạp, leo núi đi bộ đường dài, kính râm thể thao ngoài trời",
+    "price": 80000,
+    "originalPrice": 27800,
+    "sold": 20,
+    "category": "Kính",
+    "colors": [
+      "Gỗ óc chó",
+      "Xanh ngọc đậm",
+      "Xanh rêu nhạt",
+      "Đen"
+    ],
+    "image": "/images/products/6912f7b286c7b090c18b605e.jpg"
+  },
+  {
+    "id": "6912f6d586c7b090c18b5ff9",
+    "name": "Kính râm che nắng thể thao ngoài trời mới dành cho nam và nữ",
+    "price": 70000,
+    "originalPrice": 11700,
+    "sold": 26,
+    "category": "Kính",
+    "colors": [
+      "Cam",
+      "Hồng phấn",
+      "Xám nhạt",
+      "Đen"
+    ],
+    "image": "/images/products/6912f6d586c7b090c18b5ff9.jpg"
+  },
+  {
+    "id": "6912f60086c7b090c18b5a12",
+    "name": "Kính thể thao, kính râm chống gió",
+    "price": 45000,
+    "originalPrice": 8600,
+    "sold": 11,
+    "category": "Kính",
+    "colors": [
+      "Bạc",
+      "Đen"
+    ],
+    "image": "/images/products/6912f60086c7b090c18b5a12.jpg"
+  },
+  {
+    "id": "6912f58686c7b090c18b5a0d",
+    "name": "Kính mát Retro Cá Tính Mắt Mèo",
+    "price": 60000,
+    "originalPrice": 27300,
+    "sold": 6,
+    "category": "Kính",
+    "colors": [
+      "Hồng phấn",
+      "Đen"
+    ],
+    "image": "/images/products/6912f58686c7b090c18b5a0d.jpg"
+  },
+  {
+    "id": "6912f4fd86c7b090c18b5a08",
+    "name": "Kính leo núi dành cho nam và nữ Kính phân cực Cyberpunk Y2K",
+    "price": 120000,
+    "originalPrice": 62400,
+    "sold": 12,
+    "category": "Kính",
+    "colors": [
+      "Bạc",
+      "Cam",
+      "Đen"
+    ],
+    "image": "/images/products/6912f4fd86c7b090c18b5a08.jpg"
+  },
+  {
+    "id": "6912f40f86c7b090c18b58f2",
+    "name": "Kính Y2k Thiên Niên Kỷ Cyberpunk",
+    "price": 90000,
+    "originalPrice": 31000,
+    "sold": 5,
+    "category": "Kính",
+    "colors": [
+      "Bạc",
+      "Đen"
+    ],
+    "image": "/images/products/6912f40f86c7b090c18b58f2.jpg"
+  },
+  {
+    "id": "6912f3a786c7b090c18b58d4",
+    "name": "Kính Mát Cao Cấp Phong Cách Retro Y2K",
+    "price": 70000,
+    "originalPrice": 11310,
+    "sold": 4,
+    "category": "Kính",
+    "colors": [
+      "Đen"
+    ],
+    "image": "/images/products/6912f3a786c7b090c18b58d4.jpg"
+  },
+  {
+    "id": "6912f30c86c7b090c18b58cf",
+    "name": "Kính Y2K kính râm cyberpunk",
+    "price": 90000,
+    "originalPrice": 39000,
+    "sold": 9,
+    "category": "Kính",
+    "colors": [
+      "Đen",
+      "Xám nhạt",
+      "Vàng gold"
+    ],
+    "image": "/images/products/6912f30c86c7b090c18b58cf.jpg"
+  },
+  {
+    "id": "6912e53486c7b090c18af50d",
+    "name": "Giày đi bộ đường dài bằng lưới thoáng khí, giày leo núi chống trượt",
+    "price": 550000,
+    "originalPrice": 370000,
+    "sold": 16,
+    "category": "Giày",
+    "colors": [
+      "Be",
+      "Xám",
+      "Đen"
+    ],
+    "image": "/images/products/6912e53486c7b090c18af50d.jpg"
+  },
+  {
+    "id": "6911c4f860e8f79e3daa55d2",
+    "name": "Lót giày 4D thể thao bằng cao su non êm đàn hồi thoáng khí chống sốc",
+    "price": 60000,
+    "originalPrice": 40000,
+    "sold": 107,
+    "category": "Phụ Kiện",
+    "colors": [
+      "Đen"
+    ],
+    "image": "/images/products/6911c4f860e8f79e3daa55d2.jpg"
+  },
+  {
+    "id": "6911c44f60e8f79e3daa516e",
+    "name": "Ủng xốp chất liệu nhựa EVA siêu nhẹ, siêu êm",
+    "price": 240000,
+    "originalPrice": 170000,
+    "sold": 16,
+    "category": "Ủng",
+    "colors": [
+      "Vàng kem",
+      "Đen"
+    ],
+    "image": "/images/products/6911c44f60e8f79e3daa516e.jpg"
+  },
+  {
+    "id": "6911c2b760e8f79e3daa3ba2",
+    "name": "Tay áo chống nắng, chống tia UV",
+    "price": 40000,
+    "originalPrice": 15000,
+    "sold": 74,
+    "category": "Phụ Kiện",
+    "colors": [
+      "Be",
+      "Trắng",
+      "Xám nhạt",
+      "Đen"
+    ],
+    "image": "/images/products/6911c2b760e8f79e3daa3ba2.jpg"
+  },
+  {
+    "id": "69118b7a60e8f79e3da8feb5",
+    "name": "Mũ Leo Núi Lạnh Mũ Dệt Kim",
+    "price": 110000,
+    "originalPrice": 63180,
+    "sold": 21,
+    "category": "Mũ",
+    "colors": [
+      "Trắng",
+      "Xanh lam",
+      "Xanh rêu"
+    ],
+    "image": "/images/products/69118b7a60e8f79e3da8feb5.jpg"
+  },
+  {
+    "id": "69118ac660e8f79e3da8f61a",
+    "name": "Mũ len jacquard chống lạnh",
+    "price": 110000,
+    "originalPrice": 58500,
+    "sold": 22,
+    "category": "Mũ",
+    "colors": [
+      "Nâu sữa",
+      "Trắng",
+      "Xanh navy"
+    ],
+    "image": "/images/products/69118ac660e8f79e3da8f61a.jpg"
+  },
+  {
+    "id": "69118a3760e8f79e3da8f1c5",
+    "name": "Mũ vành ngắn ngoài trời mềm mại",
+    "price": 110000,
+    "originalPrice": 39000,
+    "sold": 21,
+    "category": "Mũ",
+    "colors": [
+      "Trắng",
+      "Tím oải hương",
+      "Xanh oliu"
+    ],
+    "image": "/images/products/69118a3760e8f79e3da8f1c5.jpg"
+  },
+  {
+    "id": "6911898860e8f79e3da8e05d",
+    "name": "Mũ outdoor dã ngoại",
+    "price": 120000,
+    "originalPrice": 78000,
+    "sold": 7,
+    "category": "Mũ",
+    "colors": [
+      "Xanh rêu"
+    ],
+    "image": "/images/products/6911898860e8f79e3da8e05d.jpg"
+  },
+  {
+    "id": "6911890060e8f79e3da8d7b4",
+    "name": "Mũ lưỡi trai",
+    "price": 100000,
+    "originalPrice": 50700,
+    "sold": 13,
+    "category": "Mũ",
+    "colors": [
+      "Kem",
+      "Xanh dương"
+    ],
+    "image": "/images/products/6911890060e8f79e3da8d7b4.jpg"
+  },
+  {
+    "id": "691187ca60e8f79e3da8ce25",
+    "name": "Quần leo núi chống nước, nhanh khô vải dù",
+    "price": 400000,
+    "originalPrice": 269100,
+    "sold": 11,
+    "category": "Quần Dài",
+    "colors": [
+      "Cam đậm",
+      "Trắng",
+      "Xanh navy",
+      "Xanh Navy"
+    ],
+    "image": "/images/products/691187ca60e8f79e3da8ce25.jpg"
+  },
+  {
+    "id": "6911867360e8f79e3da8bc8c",
+    "name": "Quần ngoài trời thể thao chống gió, lót nỉ",
+    "price": 400000,
+    "originalPrice": 265200,
+    "sold": 5,
+    "category": "Quần Dài",
+    "colors": [
+      "Trắng"
+    ],
+    "image": "/images/products/6911867360e8f79e3da8bc8c.jpg"
+  },
+  {
+    "id": "6911861460e8f79e3da8bc87",
+    "name": "Quần ngoài trời thể thao chống gió",
+    "price": 400000,
+    "originalPrice": 226200,
+    "sold": 12,
+    "category": "Quần Dài",
+    "colors": [
+      "Ghi",
+      "Hồng phấn",
+      "Đen"
+    ],
+    "image": "/images/products/6911861460e8f79e3da8bc87.jpg"
+  },
+  {
+    "id": "691184d360e8f79e3da8bc82",
+    "name": "Quần chống nước, chống gió, có đai, dáng rộng",
+    "price": 300000,
+    "originalPrice": 187200,
+    "sold": 13,
+    "category": "Quần Dài",
+    "colors": [
+      "Xanh rêu"
+    ],
+    "image": "/images/products/691184d360e8f79e3da8bc82.jpg"
+  },
+  {
+    "id": "691183e760e8f79e3da8bc44",
+    "name": "Quần leo núi chống nước oversize",
+    "price": 350000,
+    "originalPrice": 226200,
+    "sold": 22,
+    "category": "Quần Dài",
+    "colors": [
+      "Ghi",
+      "Trắng",
+      "Tím oải hương",
+      "Xanh coban",
+      "Đen"
+    ],
+    "image": "/images/products/691183e760e8f79e3da8bc44.jpg"
+  },
+  {
+    "id": "69116a4560e8f79e3da77314",
+    "name": "Giày outdoor chống trượt thoáng khí",
+    "price": 500000,
+    "originalPrice": 312000,
+    "sold": 50,
+    "category": "Giày",
+    "colors": [
+      "Ghi",
+      "Hồng cánh sen",
+      "Nâu sữa",
+      "Xám nhạt"
+    ],
+    "image": "/images/products/69116a4560e8f79e3da77314.jpg"
+  },
+  {
+    "id": "68f7a5de100409b6a7d6f46e",
+    "name": "Áo khoác 2 lớp giữ ấm tốt, đa dụng trekking",
+    "price": 700000,
+    "originalPrice": 550000,
+    "sold": 1,
+    "category": "Áo Khoác",
+    "colors": [
+      "Tím"
+    ],
+    "image": "/images/products/68f7a5de100409b6a7d6f46e.jpg"
+  },
+  {
+    "id": "68e4782d98dff8381277c2dc",
+    "name": "Balo leo núi du lịch ngoài trời",
+    "price": 260000,
+    "originalPrice": 149000,
+    "sold": 5,
+    "category": "Balo",
+    "colors": [
+      "Cam san hô",
+      "Xanh ngọc",
+      "Xanh rêu",
+      "Xanh than",
+      "Đen"
+    ],
+    "image": "/images/products/68e4782d98dff8381277c2dc.jpg"
+  },
+  {
+    "id": "68d647cb3ca599f20c98d9c7",
+    "name": "Quần nước rút ngoài trời",
+    "price": 180000,
+    "originalPrice": 99000,
+    "sold": 2,
+    "category": "Quần Dài",
+    "colors": [
+      "Xanh oliu"
+    ],
+    "image": "/images/products/68d647cb3ca599f20c98d9c7.jpg"
+  },
+  {
+    "id": "68d647633ca599f20c98d9c2",
+    "name": "Quần leo núi lụa đá khô nhanh",
+    "price": 240000,
+    "originalPrice": 139000,
+    "sold": 2,
+    "category": "Quần Dài",
+    "colors": [
+      "Đỏ đậm"
+    ],
+    "image": "/images/products/68d647633ca599f20c98d9c2.jpg"
+  },
+  {
+    "id": "68d6469c3ca599f20c98d557",
+    "name": "Quần gió DAPSTRING",
+    "price": 260000,
+    "originalPrice": 150000,
+    "sold": 4,
+    "category": "Quần Dài",
+    "colors": [
+      "Xanh rêu nhạt",
+      "Be"
+    ],
+    "image": "/images/products/68d6469c3ca599f20c98d557.jpg"
+  },
+  {
+    "id": "68d5260e09540c8aebcef4b2",
+    "name": "Quần phong cách oversize",
+    "price": 220000,
+    "originalPrice": 104000,
+    "sold": 2,
+    "category": "Quần Dài",
+    "colors": [
+      "Nâu"
+    ],
+    "image": "/images/products/68d5260e09540c8aebcef4b2.jpg"
+  },
+  {
+    "id": "68d5256f09540c8aebceefe8",
+    "name": "Quần dài lụa rộng",
+    "price": 160000,
+    "originalPrice": 66000,
+    "sold": 4,
+    "category": "Quần Dài",
+    "colors": [
+      "Xanh rêu",
+      "Hồng"
+    ],
+    "image": "/images/products/68d5256f09540c8aebceefe8.jpg"
+  },
+  {
+    "id": "68d524b809540c8aebceda87",
+    "name": "Quần silk lụa",
+    "price": 170000,
+    "originalPrice": 91000,
+    "sold": 6,
+    "category": "Quần Dài",
+    "colors": [
+      "Hồng",
+      "Vàng đồng",
+      "Xanh lam nhạt"
+    ],
+    "image": "/images/products/68d524b809540c8aebceda87.jpg"
+  },
+  {
+    "id": "68d523c609540c8aebced200",
+    "name": "Quần nữ oversize",
+    "price": 230000,
+    "originalPrice": 126000,
+    "sold": 7,
+    "category": "Quần Dài",
+    "colors": [
+      "Be",
+      "Hồng",
+      "Xanh oliu",
+      "Xám Đậm",
+      "Xám đậm"
+    ],
+    "image": "/images/products/68d523c609540c8aebced200.jpg"
+  },
+  {
+    "id": "68d5224009540c8aebcec524",
+    "name": "Giày đi bộ đường dài cổ lửng",
+    "price": 450000,
+    "originalPrice": 309000,
+    "sold": 65,
+    "category": "Giày",
+    "colors": [
+      "Hồng nude",
+      "Hồng phấn",
+      "Nâu nhạt",
+      "Xanh xám"
+    ],
+    "image": "/images/products/68d5224009540c8aebcec524.jpg"
+  },
+  {
+    "id": "68d5217809540c8aebcec51f",
+    "name": "Giày Summer Outdoor Versatile Versatile",
+    "price": 350000,
+    "originalPrice": 216000,
+    "sold": 9,
+    "category": "Giày",
+    "colors": [
+      "Xám nhạt",
+      "Đen"
+    ],
+    "image": "/images/products/68d5217809540c8aebcec51f.jpg"
+  },
+  {
+    "id": "68d520f609540c8aebcec51a",
+    "name": "Giày đi bộ đường dài ngoài trời dành cho nam và nữ",
+    "price": 350000,
+    "originalPrice": 217000,
+    "sold": 5,
+    "category": "Giày",
+    "colors": [
+      "Nâu sữa"
+    ],
+    "image": "/images/products/68d520f609540c8aebcec51a.jpg"
+  },
+  {
+    "id": "68d5209209540c8aebcec515",
+    "name": "Giày Humtto đi bộ đường dài, leo núi",
+    "price": 850000,
+    "originalPrice": 586000,
+    "sold": 19,
+    "category": "Giày",
+    "colors": [
+      "Be",
+      "Be Xanh Hà Lan",
+      "Be xanh đậm",
+      "Trắng ngà",
+      "Xanh biển",
+      "Xám đậm cam"
+    ],
+    "image": "/images/products/68d5209209540c8aebcec515.jpg"
+  },
+  {
+    "id": "68d3b25829bdc446b21d7d35",
+    "name": "Giày đi bộ đường cao cổ không thấm nước",
+    "price": 450000,
+    "originalPrice": 324000,
+    "sold": 5,
+    "category": "Giày",
+    "colors": [
+      "Xám"
+    ],
+    "image": "/images/products/68d3b25829bdc446b21d7d35.jpg"
+  },
+  {
+    "id": "68d3a3a029bdc446b21d3adb",
+    "name": "Balo leo núi loại 30L",
+    "price": 350000,
+    "originalPrice": 155000,
+    "sold": 5,
+    "category": "Balo",
+    "colors": [
+      "Vàng",
+      "Xanh lá mạ",
+      "Đen"
+    ],
+    "image": "/images/products/68d3a3a029bdc446b21d3adb.jpg"
+  },
+  {
+    "id": "68d3a29229bdc446b21d3ac0",
+    "name": "Balo leo núi kết hợp du lịch",
+    "price": 300000,
+    "originalPrice": 173000,
+    "sold": 5,
+    "category": "Balo",
+    "colors": [
+      "Trắng",
+      "Xanh",
+      "Đen"
+    ],
+    "image": "/images/products/68d3a29229bdc446b21d3ac0.jpg"
+  },
+  {
+    "id": "68d3a16629bdc446b21d38c8",
+    "name": "Balo leo núi nylon 15L",
+    "price": 250000,
+    "originalPrice": 158000,
+    "sold": 0,
+    "category": "Balo",
+    "colors": [
+      "Cam cát",
+      "Hồng",
+      "Tím",
+      "Xanh coban",
+      "Xanh lá nhạt"
+    ],
+    "image": "/images/products/68d3a16629bdc446b21d38c8.jpg"
+  },
+  {
+    "id": "68d3a09f29bdc446b21d38c1",
+    "name": "Balo leo núi bama",
+    "price": 250000,
+    "originalPrice": 151000,
+    "sold": 3,
+    "category": "Balo",
+    "colors": [
+      "Cam",
+      "Tím",
+      "Xám xanh",
+      "Đen"
+    ],
+    "image": "/images/products/68d3a09f29bdc446b21d38c1.jpg"
+  },
+  {
+    "id": "68d39fbd29bdc446b21d38bd",
+    "name": "Balo leo núi, du lịch có bọc 40L",
+    "price": 500000,
+    "originalPrice": 387000,
+    "sold": 4,
+    "category": "Balo",
+    "colors": [
+      "Vàng Xanh",
+      "Xanh lá nhạt",
+      "Xám Rêu",
+      "Xám Vàng",
+      "Đen"
+    ],
+    "image": "/images/products/68d39fbd29bdc446b21d38bd.jpg"
+  },
+  {
+    "id": "68d39ecb29bdc446b21d32a5",
+    "name": "Balo leo núi Backpack",
+    "price": 420000,
+    "originalPrice": 313000,
+    "sold": 3,
+    "category": "Balo",
+    "colors": [
+      "Xanh rêu",
+      "Vàng Nâu",
+      "Xám Xanh"
+    ],
+    "image": "/images/products/68d39ecb29bdc446b21d32a5.jpg"
+  },
+  {
+    "id": "68d39dd229bdc446b21d2679",
+    "name": "Balo leo núi 40L",
+    "price": 450000,
+    "originalPrice": 290000,
+    "sold": 15,
+    "category": "Balo",
+    "colors": [
+      "Cam",
+      "Tím",
+      "Vàng",
+      "Vàng Xám",
+      "Xanh ngọc bích",
+      "Xanh Xám",
+      "Xám",
+      "Đen"
+    ],
+    "image": "/images/products/68d39dd229bdc446b21d2679.jpg"
+  },
+  {
+    "id": "68d39d5a29bdc446b21d2675",
+    "name": "Balo leo núi 30L",
+    "price": 350000,
+    "originalPrice": 255000,
+    "sold": 43,
+    "category": "Balo",
+    "colors": [
+      "Cam",
+      "Tím",
+      "Vàng",
+      "Vàng Xám",
+      "Xanh ngọc bích",
+      "Xanh Xám",
+      "Xám",
+      "Đen"
+    ],
+    "image": "/images/products/68d39d5a29bdc446b21d2675.jpg"
+  },
+  {
+    "id": "68d2472129bdc446b217f4da",
+    "name": "Quần nam, nữ oversize đi bộ đường dài",
+    "price": 400000,
+    "originalPrice": 290000,
+    "sold": 49,
+    "category": "Quần Dài",
+    "colors": [
+      "Ghi",
+      "Tím",
+      "Xanh ngọc",
+      "Đen"
+    ],
+    "image": "/images/products/68d2472129bdc446b217f4da.jpg"
+  },
+  {
+    "id": "68d2468929bdc446b217ec71",
+    "name": "Quần không thấm nước rộng rãi thể thao đi bộ đường dài ngoài trời",
+    "price": 300000,
+    "originalPrice": 202000,
+    "sold": 5,
+    "category": "Quần Dài",
+    "colors": [
+      "Đen",
+      "Nâu"
+    ],
+    "image": "/images/products/68d2468929bdc446b217ec71.jpg"
+  },
+  {
+    "id": "68d244d629bdc446b217ec6c",
+    "name": "Quần sấy khô nhanh quần ngoài trời quần dài quần đi bộ đường dài",
+    "price": 310000,
+    "originalPrice": 195000,
+    "sold": 7,
+    "category": "Quần Dài",
+    "colors": [
+      "Xám",
+      "Đen"
+    ],
+    "image": "/images/products/68d244d629bdc446b217ec6c.jpg"
+  },
+  {
+    "id": "68d2444029bdc446b217ebce",
+    "name": "Quần 4 mặt đàn hồi",
+    "price": 320000,
+    "originalPrice": 202000,
+    "sold": 4,
+    "category": "Quần Dài",
+    "colors": [
+      "Xanh Hải Quân",
+      "Đen"
+    ],
+    "image": "/images/products/68d2444029bdc446b217ebce.jpg"
+  },
+  {
+    "id": "68d0fa4229bdc446b210d290",
+    "name": "quần đi bộ đường dài ống rộng không thấm nước",
+    "price": 350000,
+    "originalPrice": 217000,
+    "sold": 25,
+    "category": "Quần Dài",
+    "colors": [
+      "Be",
+      "Rêu",
+      "Đen"
+    ],
+    "image": "/images/products/68d0fa4229bdc446b210d290.jpg"
+  },
+  {
+    "id": "68d0b2d029bdc446b20f41f1",
+    "name": "Áo khoác không thấm nước có thể tháo rời Waterprot-PiST",
+    "price": 520000,
+    "originalPrice": 368600,
+    "sold": 15,
+    "category": "Áo Khoác",
+    "colors": [
+      "Be",
+      "Xanh"
+    ],
+    "image": "/images/products/68d0b2d029bdc446b20f41f1.jpg"
+  },
+  {
+    "id": "68d0b19329bdc446b20f3d87",
+    "name": "Bộ đồ áo gió mới của Luojia dành cho nam và nữ",
+    "price": 350000,
+    "originalPrice": 220000,
+    "sold": 17,
+    "category": "Áo Khoác",
+    "colors": [
+      "Cam",
+      "Hồng",
+      "Đen"
+    ],
+    "image": "/images/products/68d0b19329bdc446b20f3d87.jpg"
+  },
+  {
+    "id": "68cd0c8c29bdc446b200e410",
+    "name": "Áo khoác Luojia dành cho nam và nữ chống thấm nước 3 lớp",
+    "price": 500000,
+    "originalPrice": 369000,
+    "sold": 16,
+    "category": "Áo Khoác",
+    "colors": [
+      "Cam",
+      "Hồng",
+      "Đen"
+    ],
+    "image": "/images/products/68cd0c8c29bdc446b200e410.jpg"
+  },
+  {
+    "id": "68cd09e829bdc446b200d641",
+    "name": "Áo khoác dã ngoại, đi bộ đường dài cho nữ",
+    "price": 360000,
+    "originalPrice": 276000,
+    "sold": 7,
+    "category": "Áo Khoác",
+    "colors": [
+      "Vàng chanh"
+    ],
+    "image": "/images/products/68cd09e829bdc446b200d641.jpg"
+  },
+  {
+    "id": "68cd07f329bdc446b200d189",
+    "name": "Áo khoác Suzaku Hard Shell không thấm nước",
+    "price": 320000,
+    "originalPrice": 180000,
+    "sold": 7,
+    "category": "Áo Khoác",
+    "colors": [
+      "Đen",
+      "Đỏ"
+    ],
+    "image": "/images/products/68cd07f329bdc446b200d189.jpg"
+  },
+  {
+    "id": "68cd074929bdc446b200d15a",
+    "name": "Áo khoác không thấm nước cho áo khoác không thấm nước",
+    "price": 300000,
+    "originalPrice": 162000,
+    "sold": 18,
+    "category": "Áo Khoác",
+    "colors": [
+      "Cam cát",
+      "Hồng",
+      "Xanh ngọc đậm"
+    ],
+    "image": "/images/products/68cd074929bdc446b200d15a.jpg"
+  },
+  {
+    "id": "68cd053929bdc446b200c817",
+    "name": "Áo khoác cặp đôi, áo khoác nam và nữ",
+    "price": 260000,
+    "originalPrice": 132000,
+    "sold": 13,
+    "category": "Áo Khoác",
+    "colors": [
+      "Nâu",
+      "Tím",
+      "Xanh lá"
+    ],
+    "image": "/images/products/68cd053929bdc446b200c817.jpg"
+  },
+  {
+    "id": "68cd048329bdc446b200c369",
+    "name": "Áo khoác mùa thu chống nước đi bộ đi bộ đường dài",
+    "price": 260000,
+    "originalPrice": 130000,
+    "sold": 14,
+    "category": "Áo Khoác",
+    "colors": [
+      "Hồng",
+      "Trắng",
+      "Đen"
+    ],
+    "image": "/images/products/68cd048329bdc446b200c369.jpg"
+  },
+  {
+    "id": "68cc0cd229bdc446b2fc3681",
+    "name": "áo khoác phiên bản Hàn Quốc Hàn Quốc Hooded Outdoor Mountainering Unar Young",
+    "price": 260000,
+    "originalPrice": 133000,
+    "sold": 21,
+    "category": "Áo Khoác",
+    "colors": [
+      "Be",
+      "Nâu",
+      "xanh chuối",
+      "Đen"
+    ],
+    "image": "/images/products/68cc0cd229bdc446b2fc3681.jpg"
+  },
+  {
+    "id": "68cc08a729bdc446b2fbee13",
+    "name": "Áo khoác Mùa xuân và mùa thu một lớp nam",
+    "price": 350000,
+    "originalPrice": 232000,
+    "sold": 19,
+    "category": "Áo Khoác",
+    "colors": [
+      "Trắng",
+      "Xanh navy",
+      "Xanh Đen",
+      "Đen"
+    ],
+    "image": "/images/products/68cc08a729bdc446b2fbee13.jpg"
+  }
+]

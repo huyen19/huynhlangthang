@@ -1,0 +1,71 @@
+{
+  "included": [
+    "🛡️ Bảo hiểm du lịch (Mức bồi thường tối đa 20.000.000đ/người cho trường hợp xấu nhất)",
+    "🚐 Đưa đón 2 chiều từ Hà Nội tới chân núi (có tour sẽ cần thêm xe ôm)",
+    "🏕️ Chi phí homestay (đảm bảo vệ sinh)",
+    "🍱 Chi phí các bữa ăn chính trong 2 ngày (nếu bạn là người ăn chay, hãy nói với Giang, để team có thể chuẩn bị tốt nhất)",
+    "💧 Nước uống, găng tay, áo mưa, miếng dán giữ nhiệt...các đồ dùng của tour",
+    "🧳 Chi phí porter vác đồ tối đa 3kg hành lý trên 1 khách. nếu bạn cần porter vác nhiều đồ thì có thể thêm gói plus với chi phí 150k/người/ngày, Hoặc gói premium, porter sẽ vác toàn bộ đồ cho bạn và theo kèm bạn 1v1 suốt hành trình với chi phí 500k/người/ngày",
+    "🧭 Chi phí leader có kinh nghiệm, hướng dẫn đoàn trong suốt hành trình"
+  ],
+  "excluded": [
+    "🍽️ Ăn uống tại trạm nghỉ, chi phí cá nhân",
+    "🛏️ Phòng riêng (nếu có)",
+    "🛏️ Xe giường nằm tiêu chuẩn (1 khách 1 giường) - Đối với tour xe giường nằm (Putaleng, Tả Liên Sơn)",
+    "💼 Dịch vụ thuê thêm ngoài tour (thuê thêm porter...)",
+    "🚧 Phí cao tốc (trong trường hợp lịch trình không đi qua cao tốc nhưng khách hàng yêu cầu đi cao tốc) Ví dụ đối với các tour Samu, Phu Sa Phìn, Tà Chì Nhù...xe sẽ đi QL32, nếu khách hàng cần đón tại sân bay thì xe sẽ phải đi hướng cao tốc => phát sinh 300k/lượt cao tốc, chi phí này sẽ là phát sinh nha.",
+    "💰 Tiền tip porter/leader (nếu có)",
+    "🚿 Tắm nước nóng tại lán (50k/người)",
+    "📌 Mọi chi phí phát sinh sẽ thông báo trước và cần KH đồng ý"
+  ],
+  "prepare": [
+    "👟 Giày thể thao tốt, rộng hơn chân 1–2 size (ưu tiên giày trekking chuyên dụng)",
+    "🧥 Áo khoác gió, giữ nhiệt; quần nhanh khô (nên mang 3 bộ, 2 bộ dùng trekk, 1 bộ mặc lúc về)",
+    "🔋 Sạc dự phòng (vì trên lán không có điện)",
+    "🧼 Đồ vệ sinh cá nhân, dép đi tại homestay và trên oto cho thoải mái chân hôm về",
+    "🍫 Đồ ăn vặt, năng lượng (ưu tiên thạch, kẹo ngọt bù đường nhanh)"
+  ],
+  "provided": [
+    "🎒 Balo trekking",
+    "🦯 Gậy trekking chuyên dụng",
+    "🔦 Đèn pin chuyên dụng",
+    "🌧️ Bộ áo mưa",
+    "🧤 2 đôi găng tay bảo hộ",
+    "☕ Cốc inox uống cafe",
+    "🏅 Huy chương chinh phục đỉnh",
+    "🧳 Túi đựng đồ gửi porter",
+    "🔥 Miếng dán giữ nhiệt",
+    "💧 Nước lọc đóng chai",
+    "👒 Nón tai bèo",
+    "🩴 Dép đi trên lán",
+    "⛑️ Mũ bảo hiểm (đối với tour có xe ôm như Lùng Cúng, TCN Nậm Nghiệp, Nhìu Cồ San)",
+    "🧗 Dây bảo hộ (đối với tour Phu Sa Phìn - khi chinh phục Sống Lưng Khủng Long)"
+  ],
+  "cancellation": [
+    "⏱️ Hủy trước 5 ngày: Hoàn 100% cọc",
+    "📆 Hủy 3–5 ngày: Hoàn 50% cọc",
+    "⛔ Hủy 1–3 ngày: Không hoàn cọc",
+    "📌 Trường hợp bất khả kháng (do thiên nhiên): Hoàn 100%",
+    "🔁 Chuyển tour = huỷ tour & đăng ký lại:",
+    "✔ Trước 3 ngày: hoàn 100%",
+    "✔ 1–3 ngày: hoàn 50%",
+    "✘ Trước 1 ngày: không hoàn cọc"
+  ],
+  "childPolicy": [
+    "👧 Trẻ <10 tuổi: 70% giá tour",
+    "🧒 >=10 tuổi: giá người lớn (Lưu ý: tính theo năm sinh, không tính theo ngày sinh nhật)",
+    "👨‍👩‍👧 Nhóm ≥3 người: giảm 70k/người",
+    "🎁 Hoàn thành tour: tặng 100k cho tour trekking kế tiếp"
+  ],
+  "forceMajeure": [
+    "🛡️ Bất khả kháng bao gồm: chiến tranh, bạo động, khủng bố, thiên tai, dịch bệnh, đình công, hoặc sự thay đổi chính sách pháp luật từ chính phủ.",
+    "🔄 Không áp dụng phạt / bồi thường trong các trường hợp bất khả kháng. Hai bên sẽ chủ động thảo luận để tìm giải pháp phù hợp nhằm giảm tổn thất.",
+    "📩 Trách nhiệm thông báo: Bên bị ảnh hưởng cần thông báo sớm nhất cho bên còn lại và cố gắng giảm thiểu thiệt hại có thể xảy ra.",
+    "💡 Giải pháp / đền bù (nếu có) phụ thuộc vào chính sách từ nhà cung cấp dịch vụ liên quan."
+  ],
+  "groupSize": [
+    "Tour khởi hành khi có đủ tối thiểu 8 khách.",
+    "Mỗi tour thường từ 10–12 khách, được dẫn dắt bởi ít nhất 1 leader. Trường hợp đông (15–20 khách) sẽ có thêm leader hoặc porter để đảm bảo tỷ lệ 1 người có kinh nghiệm hỗ trợ 2–3 khách.",
+    "Lịch trình có thể thay đổi trong điều kiện thời tiết xấu, yếu tố an toàn, hoặc tùy thuộc thể lực thực tế của đoàn."
+  ]
+}
