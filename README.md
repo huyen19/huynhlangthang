@@ -1,4 +1,4 @@
-# Huyền Lang Thang
+# Khang Tu Hú
 
 Website du lịch & thiện nguyện, xây dựng bằng Next.js (App Router) + Tailwind CSS. Toàn bộ nội dung (tour, quỹ thiện nguyện, sản phẩm) lưu dạng file JSON trong thư mục `data/`.
 

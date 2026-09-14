@@ -7,7 +7,7 @@ const SECTIONS: { key: keyof typeof notices; label: string }[] = [
   { key: "included", label: "✅ Giá tour bao gồm" },
   { key: "excluded", label: "❌ Giá tour không bao gồm" },
   { key: "prepare", label: "🎒 Bạn cần chuẩn bị gì khi đi tour" },
-  { key: "provided", label: "🧑‍🤝‍🧑 HLT sẽ chuẩn bị gì cho bạn?" },
+  { key: "provided", label: "🧑‍🤝‍🧑 KTH sẽ chuẩn bị gì cho bạn?" },
   { key: "cancellation", label: "⚠️ Lưu ý khi Hoàn & Huỷ tour" },
   { key: "childPolicy", label: "👶 Lưu ý giá trẻ em và ưu đãi" },
   { key: "forceMajeure", label: "🛡️ Trường hợp bất khả kháng" },

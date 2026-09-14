@@ -2,8 +2,6 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import TourList from "@/components/TourList";
-import CharitySection from "@/components/CharitySection";
-import FinanceSection from "@/components/FinanceSection";
 import GallerySection from "@/components/GallerySection";
 import Footer from "@/components/Footer";
 
@@ -15,9 +13,7 @@ export default function Home() {
         <Hero />
         <About />
         <TourList />
-        <CharitySection />
         <GallerySection />
-        <FinanceSection />
       </main>
       <Footer />
     </>

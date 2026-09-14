@@ -85,7 +85,7 @@ export default function ProductsClient({
                     type="checkbox"
                     checked={selectedCats.includes(c.name)}
                     onChange={() => toggleCat(c.name)}
-                    className="h-4 w-4 rounded border-neutral-300 accent-orange-500"
+                    className="h-4 w-4 rounded border-neutral-300 accent-blue-500"
                   />
                   {c.name}
                 </label>
@@ -108,7 +108,7 @@ export default function ProductsClient({
                 setMaxPrice(Number(e.target.value));
                 setPage(1);
               }}
-              className="mt-2 w-full accent-orange-500"
+              className="mt-2 w-full accent-blue-500"
             />
           </div>
 

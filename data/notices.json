@@ -1,19 +1,20 @@
 {
   "included": [
     "🛡️ Bảo hiểm du lịch (Mức bồi thường tối đa 20.000.000đ/người cho trường hợp xấu nhất)",
-    "🚐 Đưa đón 2 chiều từ Hà Nội tới chân núi (có tour sẽ cần thêm xe ôm)",
-    "🏕️ Chi phí homestay (đảm bảo vệ sinh)",
-    "🍱 Chi phí các bữa ăn chính trong 2 ngày (nếu bạn là người ăn chay, hãy nói với Huyền, để team có thể chuẩn bị tốt nhất)",
-    "💧 Nước uống, găng tay, áo mưa, miếng dán giữ nhiệt...các đồ dùng của tour",
+    "🚐 Xe giường nằm từ Hà Nội đến Trạm Tấu, Xe di chuyển từ homestay đến chân núi và ngược lại.",
+    "🏕️ Phòng nghỉ đêm tại homestay trước khi leo và lán nghỉ đêm trên núi",
+    "🍱 Chi phí các bữa ăn chính trong 2 ngày",
+    "💧 Nước uống, găng tay, áo mưa,...Các đồ dùng của tour",
     "🧳 Chi phí porter vác đồ tối đa 3kg hành lý trên 1 khách. nếu bạn cần porter vác nhiều đồ thì có thể thêm gói plus với chi phí 150k/người/ngày, Hoặc gói premium, porter sẽ vác toàn bộ đồ cho bạn và theo kèm bạn 1v1 suốt hành trình với chi phí 500k/người/ngày",
-    "🧭 Chi phí leader có kinh nghiệm, hướng dẫn đoàn trong suốt hành trình"
+    "🧭 Chi phí leader có kinh nghiệm, hướng dẫn đoàn trong suốt hành trình",
+    "📷 Bay flycam và chụp ảnh bằng máy cơ"
+
   ],
   "excluded": [
     "🍽️ Ăn uống tại trạm nghỉ, chi phí cá nhân",
     "🛏️ Phòng riêng (nếu có)",
-    "🛏️ Xe giường nằm tiêu chuẩn (1 khách 1 giường) - Đối với tour xe giường nằm (Putaleng, Tả Liên Sơn)",
+    "🚌 Xe di chuyển không theo khung giờ của tour, đoàn khách muốn đi xe riêng",
     "💼 Dịch vụ thuê thêm ngoài tour (thuê thêm porter...)",
-    "🚧 Phí cao tốc (trong trường hợp lịch trình không đi qua cao tốc nhưng khách hàng yêu cầu đi cao tốc) Ví dụ đối với các tour Samu, Phu Sa Phìn, Tà Chì Nhù...xe sẽ đi QL32, nếu khách hàng cần đón tại sân bay thì xe sẽ phải đi hướng cao tốc => phát sinh 300k/lượt cao tốc, chi phí này sẽ là phát sinh nha.",
     "💰 Tiền tip porter/leader (nếu có)",
     "🚿 Tắm nước nóng tại lán (50k/người)",
     "📌 Mọi chi phí phát sinh sẽ thông báo trước và cần KH đồng ý"
@@ -31,15 +32,9 @@
     "🔦 Đèn pin chuyên dụng",
     "🌧️ Bộ áo mưa",
     "🧤 2 đôi găng tay bảo hộ",
-    "☕ Cốc inox uống cafe",
     "🏅 Huy chương chinh phục đỉnh",
-    "🧳 Túi đựng đồ gửi porter",
-    "🔥 Miếng dán giữ nhiệt",
-    "💧 Nước lọc đóng chai",
-    "👒 Nón tai bèo",
-    "🩴 Dép đi trên lán",
-    "⛑️ Mũ bảo hiểm (đối với tour có xe ôm như Lùng Cúng, TCN Nậm Nghiệp, Nhìu Cồ San)",
-    "🧗 Dây bảo hộ (đối với tour Phu Sa Phìn - khi chinh phục Sống Lưng Khủng Long)"
+    "🧳 Vật liệu y tế cơ bản",
+    "💧 Nước lọc đóng chai"
   ],
   "cancellation": [
     "⏱️ Hủy trước 5 ngày: Hoàn 100% cọc",

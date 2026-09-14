@@ -3,7 +3,6 @@ import site from "@/data/site.json";
 const ICONS: Record<string, string> = {
   "Hướng dẫn viên tận tâm": "👥",
   "Ẩm thực phong phú": "🍴",
-  "Du lịch & Thiện nguyện": "💗",
   "Năng lượng tích cực": "✨",
 };
 
@@ -22,10 +21,10 @@ function renderBold(text: string) {
 
 export default function About() {
   return (
-    <section id="about" className="bg-gradient-to-b from-orange-50/60 to-white py-20">
+    <section id="about" className="bg-gradient-to-b from-blue-50/60 to-white py-20">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         <div>
-          <span className="inline-block rounded-full bg-orange-100 px-4 py-1.5 text-xs font-bold tracking-wide text-brand">
+          <span className="inline-block rounded-full bg-blue-100 px-4 py-1.5 text-xs font-bold tracking-wide text-brand">
             {site.aboutTag.toUpperCase()}
           </span>
           <h2 className="mt-4 text-3xl font-extrabold text-neutral-900 sm:text-4xl">
@@ -36,10 +35,6 @@ export default function About() {
           <p className="mt-6 text-base leading-relaxed text-neutral-700">
             {renderBold(site.aboutText1)}
           </p>
-
-          <blockquote className="mt-5 border-l-4 border-brand bg-orange-50/70 py-3 pl-5 text-base italic leading-relaxed text-neutral-700">
-            {renderBold(site.aboutText2)}
-          </blockquote>
 
           <a href="#tours" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand hover:underline">
             Tìm hiểu thêm về chúng tôi <span>→</span>

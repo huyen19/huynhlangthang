@@ -10,9 +10,9 @@ const beVietnam = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "Huyền Lang Thang - Du Lịch & Thiện Nguyện",
+  title: "Khang Tu Hú - Du Lịch Trekking",
   description:
-    "Cùng Huyền Lang Thang biến những chuyến đi trở thành hành trình ý nghĩa. Nơi kết hợp hoàn hảo giữa Du Lịch & Thiện Nguyện.",
+    "Cùng Khang Tu Hú biến những chuyến đi trở thành hành trình ý nghĩa.",
 };
 
 export default function RootLayout({

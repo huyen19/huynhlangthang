@@ -2,15 +2,15 @@ import site from "@/data/site.json";
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-gradient-to-br from-[#c2410c] to-[#7c2d12] text-white">
+    <footer className="relative overflow-hidden bg-gradient-to-br from-[#0c41c2] to-[#122d7c] text-white">
       <div className="dot-pattern absolute inset-0" />
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
           <div>
             <h3 className="flex items-center gap-2 text-2xl font-extrabold">
               <span>⛰️</span> {site.name}
             </h3>
-            <p className="mt-4 max-w-sm border-l-2 border-brand/60 pl-4 text-sm leading-relaxed text-orange-100">
+            <p className="mt-4 max-w-sm border-l-2 border-brand/60 pl-4 text-sm leading-relaxed text-blue-100">
               {site.footerText}
             </p>
             <div className="mt-6 flex gap-3">
@@ -31,7 +31,7 @@ export default function Footer() {
             <h4 className="flex items-center gap-2 text-lg font-bold">
               <span className="h-4 w-0.5 bg-brand" /> Liên Hệ
             </h4>
-            <ul className="mt-4 space-y-3 text-sm text-orange-100">
+            <ul className="mt-4 space-y-3 text-sm text-blue-100">
               <li className="flex items-center gap-2">
                 <IconBubble>📞</IconBubble>
                 <a href={`tel:${site.phone.replace(/\./g, "")}`} className="hover:text-white">
@@ -39,46 +39,33 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <IconBubble>✉️</IconBubble>
-                <a href={`mailto:${site.email}`} className="hover:text-white">
-                  {site.email}
+                <IconBubble>👍</IconBubble>
+                <a
+                  href={site.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white"
+                >
+                  Facebook
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <IconBubble>📍</IconBubble>
-                <span>{site.address}</span>
+                <IconBubble>🎵</IconBubble>
+                <a
+                  href={site.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white"
+                >
+                  TikTok
+                </a>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h4 className="flex items-center gap-2 text-lg font-bold">
-              <span className="h-4 w-0.5 bg-brand" /> Đăng ký nhận tin
-            </h4>
-            <div className="mt-4 rounded-2xl bg-white/10 p-5">
-              <p className="text-sm text-orange-100">
-                Nhận thông tin tour mới & hoạt động thiện nguyện sớm nhất.
-              </p>
-              <form className="mt-3 flex overflow-hidden rounded-full bg-white/10 ring-1 ring-white/20">
-                <input
-                  type="email"
-                  placeholder="Email của bạn..."
-                  className="w-full bg-transparent px-4 py-2 text-sm text-white placeholder-orange-200 outline-none"
-                />
-                <button
-                  type="submit"
-                  aria-label="Đăng ký"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-full bg-brand text-white"
-                >
-                  ➤
-                </button>
-              </form>
-              <p className="mt-2 text-xs text-orange-200">Không spam, chỉ gửi yêu thương.</p>
-            </div>
-          </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/15 pt-6 text-xs text-orange-100 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/15 pt-6 text-xs text-blue-100 sm:flex-row">
           <p>{site.copyright}</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:text-white">Điều khoản</a>

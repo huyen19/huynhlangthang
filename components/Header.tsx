@@ -17,27 +17,6 @@ export default function Header() {
           />
           <span className="text-lg font-bold text-neutral-900">{site.name}</span>
         </Link>
-
-        <nav className="hidden items-center gap-8 md:flex">
-          <Link
-            href="/#tours"
-            className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-brand"
-          >
-            <span>🏔️</span> Tour Trekking
-          </Link>
-          <Link
-            href="/#charity"
-            className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-brand"
-          >
-            <span>❤️</span> Quỹ Thiện Nguyện
-          </Link>
-          <Link
-            href="/products"
-            className="rounded-full bg-gradient-to-r from-brand to-brand-dark px-5 py-2 text-sm font-bold text-white shadow-sm shadow-orange-200 hover:opacity-90"
-          >
-            Cửa Hàng
-          </Link>
-        </nav>
       </div>
     </header>
   );

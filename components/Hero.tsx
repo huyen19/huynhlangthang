@@ -13,28 +13,17 @@ export default function Hero() {
           {site.companyLine}
         </p>
         <h1 className="mt-4 text-4xl font-extrabold leading-tight text-white sm:text-6xl">
-          Cùng <span className="text-brand">Huyền Lang Thang</span>
+          Cùng <span className="text-brand">Khang Tu Hú</span>
         </h1>
         <p className="mt-4 text-xl font-semibold text-white sm:text-2xl">
           {site.heroTitleLine2}
         </p>
-        <p className="mt-3 text-base text-neutral-200 sm:text-lg">
-          Nơi kết hợp hoàn hảo giữa <strong className="text-white">Du Lịch</strong> &{" "}
-          <strong className="text-white">Thiện Nguyện</strong>
-        </p>
-
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a
             href="#tours"
-            className="rounded-full bg-gradient-to-r from-brand to-brand-red px-8 py-3 text-sm font-bold text-white shadow-lg shadow-orange-900/30 hover:opacity-90 sm:text-base"
+            className="rounded-full bg-gradient-to-r from-brand to-brand-red px-8 py-3 text-sm font-bold text-white shadow-lg shadow-blue-900/30 hover:opacity-90 sm:text-base"
           >
             Khám Phá Tour Ngay
-          </a>
-          <a
-            href="#charity"
-            className="rounded-full border border-white/40 bg-white/10 px-8 py-3 text-sm font-bold text-white backdrop-blur hover:bg-white/20 sm:text-base"
-          >
-            Gây Quỹ Xây Trường
           </a>
         </div>
 

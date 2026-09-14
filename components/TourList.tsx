@@ -11,7 +11,7 @@ export default function TourList() {
           <h2 className="text-2xl font-extrabold tracking-tight text-neutral-900 sm:text-3xl">
             TOUR TREKKING NỔI BẬT
           </h2>
-          <span className="mt-4 inline-block rounded-full bg-orange-100 px-4 py-1.5 text-xs font-semibold text-brand">
+          <span className="mt-4 inline-block rounded-full bg-blue-100 px-4 py-1.5 text-xs font-semibold text-brand">
             🔥 Lịch khởi hành mới nhất từ 30/8/2025
           </span>
         </div>

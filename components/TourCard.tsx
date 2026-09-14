@@ -38,7 +38,7 @@ export default function TourCard({ tour }: { tour: Tour }) {
             <p className="text-xs text-neutral-400">GIÁ TOUR</p>
             <p className="text-lg font-extrabold text-brand">{tour.price}</p>
           </div>
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-50 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
             →
           </span>
         </div>
