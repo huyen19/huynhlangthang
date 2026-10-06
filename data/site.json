@@ -1,0 +1,32 @@
+{
+  "logo": "/images/huyen/avatar.jpg",
+  "name": "Khang Tu Hú",
+  "phone": "0355.071.405",
+  "email": "huyenlangthang@gmail.com",
+  "address": "Hà Nội, Việt Nam",
+  "facebook": "https://www.facebook.com/hu.khang.39",
+  "tiktok": "https://www.tiktok.com/@khangtuhu_tour_trekking",
+  "heroImage": "/images/huyen/cover.jpg",
+  "heroTitleLine1": "Cùng Khang Tu Hú",
+  "heroTitleLine2": "Chinh phục mọi đỉnh cao",
+  "heroSubtitle": "Nơi kết hợp hoàn hảo giữa Du Lịch & Thiện Nguyện",
+  "aboutTag": "Về chúng tôi",
+  "aboutTitleLine1": "Khám Phá & Lan Toả",
+  "aboutTitleLine2": "Cùng Khang Tu Hú",
+  "aboutText1": "**Khang Tu Hú** không chỉ cung cấp các hành trình trekking chinh phục thiên nhiên hùng vĩ, mà còn mang đến những chuyến đi **chạm đến trái tim**.",
+  "features": [
+    { "title": "Hướng dẫn viên tận tâm", "desc": "Năng động, nhiệt tình, mang đến trải nghiệm thân thiện và an toàn tuyệt đối." },
+    { "title": "Ẩm thực phong phú", "desc": "Thực đơn đa dạng, đầy đủ dinh dưỡng, hỗ trợ đồ ăn chay theo yêu cầu." },
+    { "title": "Năng lượng tích cực", "desc": "Cộng đồng trẻ, yêu khám phá và sẻ chia, tạo nên không khí sôi nổi, vui vẻ." }
+  ],
+  "footerText": "Không chỉ là những bước chân chinh phục thiên nhiên, chúng tôi mang theo sứ mệnh kết nối cộng đồng. Mỗi hành trình cùng KTH là một cơ hội để bạn góp phần lan toả yêu thương và khám phá những vùng đất mới.",
+  "copyright": "© 2026 Khang Tu Hú Travel. All rights reserved.",
+  "finance": {
+    "title": "Minh Bạch Tài Chính",
+    "subtitle": "Tổng kết hoạt động từ 09/2024 đến nay",
+    "totalRaised": "1.118.676.362 ₫",
+    "totalUsed": "813.300.500 ₫",
+    "currentBalance": "305.375.862 ₫",
+    "statementLink": "https://thiennguyen.app/user/hanhtrinhyeuthuong"
+  }
+}

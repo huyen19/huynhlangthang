@@ -1,0 +1,66 @@
+{
+  "included": [
+    "🛡️ Bảo hiểm du lịch (Mức bồi thường tối đa 20.000.000đ/người cho trường hợp xấu nhất)",
+    "🚐 Xe giường nằm từ Hà Nội đến homestay, Xe di chuyển từ homestay đến chân núi và ngược lại.",
+    "🏕️ Phòng nghỉ đêm tại homestay trước khi leo và lán nghỉ đêm trên núi",
+    "🍱 Chi phí các bữa ăn chính trong 2 ngày",
+    "💧 Nước uống, găng tay, áo mưa,...Các đồ dùng của tour",
+    "🧳 Chi phí porter vác đồ tối đa 3kg hành lý trên 1 khách. nếu bạn cần porter vác nhiều đồ thì có thể thêm gói plus với chi phí 150k/người/ngày, Hoặc gói premium, porter sẽ vác toàn bộ đồ cho bạn và theo kèm bạn 1v1 suốt hành trình với chi phí 500k/người/ngày",
+    "🧭 Chi phí leader có kinh nghiệm, hướng dẫn đoàn trong suốt hành trình",
+    "**📷 Bay flycam và chụp ảnh bằng máy cơ**"
+
+  ],
+  "excluded": [
+    "🍽️ Ăn uống tại trạm nghỉ, chi phí cá nhân",
+    "🛏️ Phòng riêng (nếu có)",
+    "🚌 Xe di chuyển không theo khung giờ của tour, đoàn khách muốn đi xe riêng",
+    "💼 Dịch vụ thuê thêm ngoài tour (thuê thêm porter...)",
+    "💰 Tiền tip porter/leader (nếu có)",
+    "🚿 Tắm nước nóng tại lán (50k/người)",
+    "📌 Mọi chi phí phát sinh sẽ thông báo trước và cần KH đồng ý"
+  ],
+  "prepare": [
+    "👟 Giày thể thao tốt, rộng hơn chân 1–2 size (ưu tiên giày trekking chuyên dụng)",
+    "🧥 Áo khoác gió, giữ nhiệt; quần nhanh khô (nên mang 3 bộ, 2 bộ dùng trekk, 1 bộ mặc lúc về)",
+    "🔋 Sạc dự phòng (vì trên lán không có điện)",
+    "🧼 Đồ vệ sinh cá nhân, dép đi tại homestay và trên oto cho thoải mái chân hôm về",
+    "🍫 Đồ ăn vặt, năng lượng (ưu tiên thạch, kẹo ngọt bù đường nhanh)"
+  ],
+  "provided": [
+    "🎒 Balo trekking",
+    "🦯 Gậy trekking chuyên dụng",
+    "🔦 Đèn pin chuyên dụng",
+    "🌧️ Bộ áo mưa",
+    "🧤 2 đôi găng tay bảo hộ",
+    "🏅 Huy chương chinh phục đỉnh",
+    "🧳 Vật liệu y tế cơ bản",
+    "💧 Nước lọc đóng chai"
+  ],
+  "cancellation": [
+    "⏱️ Hủy trước 5 ngày: Hoàn 100% cọc",
+    "📆 Hủy 3–5 ngày: Hoàn 50% cọc",
+    "⛔ Hủy 1–3 ngày: Không hoàn cọc",
+    "📌 Trường hợp bất khả kháng (do thiên nhiên): Hoàn 100%",
+    "🔁 Chuyển tour = huỷ tour & đăng ký lại:",
+    "✔ Trước 3 ngày: hoàn 100%",
+    "✔ 1–3 ngày: hoàn 50%",
+    "✘ Trước 1 ngày: không hoàn cọc"
+  ],
+  "childPolicy": [
+    "👧 Trẻ <10 tuổi: 70% giá tour",
+    "🧒 >=10 tuổi: giá người lớn (Lưu ý: tính theo năm sinh, không tính theo ngày sinh nhật)",
+    "👨‍👩‍👧 Nhóm ≥3 người: giảm 70k/người",
+    "🎁 Hoàn thành tour: tặng 100k cho tour trekking kế tiếp"
+  ],
+  "forceMajeure": [
+    "🛡️ Bất khả kháng bao gồm: chiến tranh, bạo động, khủng bố, thiên tai, dịch bệnh, đình công, hoặc sự thay đổi chính sách pháp luật từ chính phủ.",
+    "🔄 Không áp dụng phạt / bồi thường trong các trường hợp bất khả kháng. Hai bên sẽ chủ động thảo luận để tìm giải pháp phù hợp nhằm giảm tổn thất.",
+    "📩 Trách nhiệm thông báo: Bên bị ảnh hưởng cần thông báo sớm nhất cho bên còn lại và cố gắng giảm thiểu thiệt hại có thể xảy ra.",
+    "💡 Giải pháp / đền bù (nếu có) phụ thuộc vào chính sách từ nhà cung cấp dịch vụ liên quan."
+  ],
+  "groupSize": [
+    "Tour khởi hành khi có đủ tối thiểu 8 khách.",
+    "Mỗi tour thường từ 10–12 khách, được dẫn dắt bởi ít nhất 1 leader. Trường hợp đông (15–20 khách) sẽ có thêm leader hoặc porter để đảm bảo tỷ lệ 1 người có kinh nghiệm hỗ trợ 2–3 khách.",
+    "Lịch trình có thể thay đổi trong điều kiện thời tiết xấu, yếu tố an toàn, hoặc tùy thuộc thể lực thực tế của đoàn."
+  ]
+}
