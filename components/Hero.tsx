@@ -9,10 +9,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/80" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
-        <p className="text-sm font-bold tracking-[0.2em] text-brand uppercase sm:text-base">
-          {site.companyLine}
-        </p>
-        <h1 className="mt-4 text-4xl font-extrabold leading-tight text-white sm:text-6xl">
+        <h1 className="text-4xl font-extrabold leading-tight text-white sm:text-6xl">
           Cùng <span className="text-brand">Khang Tu Hú</span>
         </h1>
         <p className="mt-4 text-xl font-semibold text-white sm:text-2xl">

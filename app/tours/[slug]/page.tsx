@@ -6,7 +6,7 @@ import type { Tour } from "@/lib/types";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TourTabs from "@/components/TourTabs";
-import TourCard from "@/components/TourCard";
+// import TourCard from "@/components/TourCard";
 
 const allTours = tours as Tour[];
 
@@ -25,7 +25,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
   const tour = allTours.find((t) => t.slug === slug);
   if (!tour) return notFound();
 
-  const related = allTours.filter((t) => t.slug !== tour.slug).slice(0, 6);
+  // const related = allTours.filter((t) => t.slug !== tour.slug).slice(0, 6);
 
   return (
     <>
@@ -97,7 +97,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
         </section>
 
         {/* Related tours */}
-        <section className="bg-neutral-50 py-16">
+        {/* <section className="bg-neutral-50 py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h2 className="text-center text-2xl font-extrabold text-neutral-900">Khám Phá Thêm</h2>
             <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -106,7 +106,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
       <Footer />
     </>

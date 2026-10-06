@@ -16,9 +16,9 @@ export default function TourCard({ tour }: { tour: Tour }) {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-105"
         />
-        <span className="absolute left-3 top-3 rounded-full bg-brand-red/90 px-3 py-1 text-xs font-bold text-white">
+        {/* <span className="absolute left-3 top-3 rounded-full bg-brand-red/90 px-3 py-1 text-xs font-bold text-white">
           🔥 {tour.tag}
-        </span>
+        </span> */}
         <div className="absolute bottom-3 left-3 flex gap-2">
           <span className="rounded-full bg-black/55 px-2.5 py-1 text-xs font-medium text-white">
             🕐 {tour.duration}

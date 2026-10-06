@@ -32,9 +32,15 @@ const POLICY_GROUPS: Group[] = [
 function NoticeList({ items }: { items: string[] }) {
   return (
     <ul className="space-y-2 text-sm leading-relaxed text-neutral-600">
-      {items.map((item, i) => (
-        <li key={i}>{item}</li>
-      ))}
+      {items.map((item, i) => {
+        // Dòng bọc trong **...** sẽ được in đậm.
+        const bold = item.startsWith("**") && item.endsWith("**");
+        return bold ? (
+          <li key={i} className="font-bold text-neutral-900">{item.slice(2, -2)}</li>
+        ) : (
+          <li key={i}>{item}</li>
+        );
+      })}
     </ul>
   );
 }

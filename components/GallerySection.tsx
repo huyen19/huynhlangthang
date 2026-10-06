@@ -2,7 +2,8 @@ import Image from "next/image";
 import gallery from "@/data/gallery.json";
 
 export default function GallerySection() {
-  const images = gallery as string[];
+  // Chỉ hiện 10 ảnh đầu; ảnh từ thứ 11 trở đi tạm ẩn. Bỏ .slice(0, 10) để hiện lại tất cả.
+  const images = (gallery as string[]).slice(0, 10);
   return (
     <section className="bg-neutral-50 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
